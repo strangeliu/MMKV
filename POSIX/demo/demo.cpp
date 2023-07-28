@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <cstring>
+#include <cassert>
 
 using namespace std;
 using namespace mmkv;
@@ -340,6 +341,30 @@ void testRestore() {
     }
 }
 
+void testAutoExpiration() {
+    string mmapID = "testAutoExpire";
+    auto mmkv = MMKV::mmkvWithID(mmapID);
+    mmkv->clearAll();
+    mmkv->trim();
+    mmkv->disableAutoKeyExpire();
+
+    mmkv->set(true, "auto_expire_key_1");
+    mmkv->enableAutoKeyExpire(1);
+    mmkv->set("never_expire_value_1", "never_expire_key_1", MMKV::ExpireNever);
+
+    sleep(2);
+    assert(mmkv->containsKey("auto_expire_key_1") == false);
+    assert(mmkv->containsKey("never_expire_key_1") == true);
+
+    mmkv->removeValueForKey("never_expire_key_1");
+    mmkv->enableAutoKeyExpire(MMKV::ExpireNever);
+    mmkv->set("never_expire_value_1", "never_expire_key_1");
+    mmkv->set(true, "auto_expire_key_1", 1);
+    sleep(2);
+    assert(mmkv->containsKey("never_expire_key_1") == true);
+    assert(mmkv->containsKey("auto_expire_key_1") == false);
+}
+
 void MyLogHandler(MMKVLogLevel level, const char *file, int line, const char *function, const string &message) {
 
     auto desc = [level] {
@@ -366,9 +391,9 @@ int main() {
     srand((uint64_t) &c);
 
     string rootDir = "/tmp/mmkv";
-    MMKV::initializeMMKV(rootDir);
-    //MMKV::setLogLevel(MMKVLogNone);
-    MMKV::registerLogHandler(MyLogHandler);
+    MMKV::initializeMMKV(rootDir, MMKVLogInfo, MyLogHandler);
+    // MMKV::setLogLevel(MMKVLogNone);
+    // MMKV::registerLogHandler(MyLogHandler);
 
     //auto mmkv = MMKV::defaultMMKV();
     string aesKey = "cryptKey";
@@ -389,4 +414,5 @@ int main() {
     testInterProcessLock();
     testBackup();
     testRestore();
+    testAutoExpiration();
 }

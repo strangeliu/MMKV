@@ -4,16 +4,18 @@ import (
 	"fmt"
 	//"log"
 	"math"
+	"time"
 
 	"tencent.com/mmkv"
 )
 
 func main() {
-	// init MMKV with root dir
-	mmkv.InitializeMMKV("/tmp/mmkv")
+	// init MMKV with root dir and log redirecting
+	mmkv.InitializeMMKVWithLogLevelAndHandler("/tmp/mmkv", mmkv.MMKVLogInfo, logHandler)
 
 	// you can set log redirecting
-	mmkv.RegisterLogHandler(logHandler)
+	// mmkv.RegisterLogHandler(logHandler)
+
 	// you can set error handler
 	mmkv.RegisterErrorHandler(errorHandler)
 	// you can get notify content change by other process (not in realtime)
@@ -25,6 +27,7 @@ func main() {
 	testMMKV("test/Encrypt", "cryptKey", false)
 	testBackup()
 	testRestore()
+	testAutoExpire()
 }
 
 func functionalTest() {
@@ -201,6 +204,29 @@ func testRestore() {
 		backupMMKV = mmkv.DefaultMMKV()
 		fmt.Println("check on restore [", backupMMKV.MMAP_ID(), "] allKeys: ", backupMMKV.AllKeys())
 	}
+}
+
+func testAutoExpire()  {
+	kv := mmkv.MMKVWithID("testAutoExpire")
+	kv.ClearAll()
+	kv.Trim()
+	kv.DisableAutoKeyExpire()
+
+	kv.SetBool(true, "auto_expire_key_1")
+	kv.EnableAutoKeyExpire(1)
+	kv.SetBoolExpire(true, "never_expire_key_1", mmkv.MMKV_Expire_Never)
+
+	time.Sleep(2 * time.Second)
+	fmt.Println("contains auto_expire_key_1:", kv.Contains("auto_expire_key_1"))
+	fmt.Println("contains never_expire_key_1:", kv.Contains("never_expire_key_1"))
+
+	kv.RemoveKey("never_expire_key_1")
+	kv.EnableAutoKeyExpire(mmkv.MMKV_Expire_Never)
+	kv.SetBool(true, "never_expire_key_1")
+	kv.SetBoolExpire(true, "auto_expire_key_1", 1)
+	time.Sleep(2 * time.Second)
+	fmt.Println("contains never_expire_key_1:", kv.Contains("never_expire_key_1"))
+	fmt.Println("contains auto_expire_key_1:", kv.Contains("auto_expire_key_1"))
 }
 
 func logHandler(level int, file string, line int, function string, message string) {

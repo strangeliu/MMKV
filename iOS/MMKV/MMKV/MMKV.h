@@ -27,6 +27,15 @@ typedef NS_ENUM(NSUInteger, MMKVMode) {
     MMKVMultiProcess = 0x2,
 };
 
+typedef NS_ENUM(UInt32, MMKVExpireDuration) {
+    MMKVExpireNever = 0,
+    MMKVExpireInMinute = 60,
+    MMKVExpireInHour = 60 * 60,
+    MMKVExpireInDay = 24 * 60 * 60,
+    MMKVExpireInMonth = 30 * 24 * 60 * 60,
+    MMKVExpireInYear = 365 * 30 * 24 * 60 * 60,
+};
+
 @interface MMKV : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
@@ -44,10 +53,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// call this in main thread, before calling any other MMKV methods
 /// @param rootDir the root dir of MMKV, passing nil defaults to {NSDocumentDirectory}/mmkv
+/// @param logLevel MMKVLogInfo by default, MMKVLogNone to disable all logging
+/// @return root dir of MMKV
++ (NSString *)initializeMMKV:(nullable NSString *)rootDir logLevel:(MMKVLogLevel)logLevel handler:(nullable id<MMKVHandler>)handler NS_SWIFT_NAME(initialize(rootDir:logLevel:handler:));
+
+/// call this in main thread, before calling any other MMKV methods
+/// @param rootDir the root dir of MMKV, passing nil defaults to {NSDocumentDirectory}/mmkv
 /// @param groupDir the root dir of multi-process MMKV, MMKV with MMKVMultiProcess mode will be stored in groupDir/mmkv
 /// @param logLevel MMKVLogInfo by default, MMKVLogNone to disable all logging
 /// @return root dir of MMKV
 + (NSString *)initializeMMKV:(nullable NSString *)rootDir groupDir:(NSString *)groupDir logLevel:(MMKVLogLevel)logLevel NS_SWIFT_NAME(initialize(rootDir:groupDir:logLevel:));
+
+/// call this in main thread, before calling any other MMKV methods
+/// @param rootDir the root dir of MMKV, passing nil defaults to {NSDocumentDirectory}/mmkv
+/// @param groupDir the root dir of multi-process MMKV, MMKV with MMKVMultiProcess mode will be stored in groupDir/mmkv
+/// @param logLevel MMKVLogInfo by default, MMKVLogNone to disable all logging
+/// @return root dir of MMKV
++ (NSString *)initializeMMKV:(nullable NSString *)rootDir groupDir:(NSString *)groupDir logLevel:(MMKVLogLevel)logLevel handler:(nullable id<MMKVHandler>)handler NS_SWIFT_NAME(initialize(rootDir:groupDir:logLevel:handler:));
 
 /// a generic purpose instance (in MMKVSingleProcess mode)
 + (nullable instancetype)defaultMMKV;
@@ -114,26 +136,37 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)checkReSetCryptKey:(nullable NSData *)cryptKey NS_SWIFT_NAME(checkReSet(cryptKey:));
 
 - (BOOL)setObject:(nullable NSObject<NSCoding> *)object forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setObject:(nullable NSObject<NSCoding> *)object forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setBool:(BOOL)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setBool:(BOOL)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setInt32:(int32_t)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setInt32:(int32_t)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setUInt32:(uint32_t)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setUInt32:(uint32_t)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setInt64:(int64_t)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setInt64:(int64_t)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setUInt64:(uint64_t)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setUInt64:(uint64_t)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setFloat:(float)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setFloat:(float)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setDouble:(double)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setDouble:(double)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setString:(NSString *)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setString:(NSString *)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setDate:(NSDate *)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setDate:(NSDate *)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (BOOL)setData:(NSData *)value forKey:(NSString *)key NS_SWIFT_NAME(set(_:forKey:));
+- (BOOL)setData:(NSData *)value forKey:(NSString *)key expireDuration:(uint32_t)seconds NS_SWIFT_NAME(set(_:forKey:expireDuration:));
 
 - (nullable id)getObjectOfClass:(Class)cls forKey:(NSString *)key NS_SWIFT_NAME(object(of:forKey:));
 
@@ -199,6 +232,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)enumerateKeys:(void (^)(NSString *key, BOOL *stop))block;
 - (NSArray *)allKeys;
+
+/// all keys created (or last modified) longger than expiredInSeconds will be deleted on next full-write-back
+/// @param expiredInSeconds = MMKVExpireNever (0) means no common expiration duration for all keys, aka each key will have it's own expiration duration
+- (BOOL)enableAutoKeyExpire:(uint32_t) expiredInSeconds NS_SWIFT_NAME(enableAutoKeyExpire(expiredInSeconds:));
+
+- (BOOL)disableAutoKeyExpire;
 
 - (void)removeValueForKey:(NSString *)key NS_SWIFT_NAME(removeValue(forKey:));
 
@@ -278,7 +317,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// check if content changed by other process
 - (void)checkContentChanged;
 
-+ (void)registerHandler:(id<MMKVHandler>)handler;
++ (void)registerHandler:(id<MMKVHandler>)handler __attribute__((deprecated("use +initializeMMKV:logLevel:handler: instead")));
 + (void)unregiserHandler;
 
 /// MMKVLogInfo by default
