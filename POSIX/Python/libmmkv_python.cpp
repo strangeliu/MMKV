@@ -99,30 +99,35 @@ PYBIND11_MODULE(mmkv, m) {
     //             py::arg("cryptKey") = (string*) nullptr,
     //             py::arg("rootDir") = (string*) nullptr);
 
-    clsMMKV.def(py::init([](const string &mmapID, MMKVMode mode, const string &cryptKey, const string &rootDir) {
+    clsMMKV.def(py::init([](const string &mmapID, MMKVMode mode, const string &cryptKey, const string &rootDir,
+                            const size_t expectedCapacity) {
                     string *cryptKeyPtr = (cryptKey.length() > 0) ? (string *) &cryptKey : nullptr;
                     string *rootDirPtr = (rootDir.length() > 0) ? (string *) &rootDir : nullptr;
-                    return MMKV::mmkvWithID(mmapID, mode, cryptKeyPtr, rootDirPtr);
+                    return MMKV::mmkvWithID(mmapID, mode, cryptKeyPtr, rootDirPtr, expectedCapacity);
                 }),
                 "Parameters:\n"
                 "  mmapID: all instances of the same mmapID share the same data and file storage\n"
                 "  mode: pass MMKVMode.MultiProcess for a multi-process MMKV\n"
                 "  cryptKey: pass a non-empty string for an encrypted MMKV, 16 bytes at most\n"
                 "  rootDir: custom root directory",
-                py::arg("mmapID"), py::arg("mode") = MMKV_SINGLE_PROCESS, py::arg("cryptKey") = string(),
-                py::arg("rootDir") = string());
+                "  expectedCapacity: the file size you expected when opening or creating file", py::arg("mmapID"),
+                py::arg("mode") = MMKV_SINGLE_PROCESS, py::arg("cryptKey") = string(), py::arg("rootDir") = string(),
+                py::arg("expectedCapacity") = 0);
 
     clsMMKV.def("__eq__", [](MMKV &kv, const MMKV &other) { return kv.mmapID() == other.mmapID(); });
 
-    clsMMKV.def_static("initializeMMKV", [](const string &rootDir, MMKVLogLevel logLevel, decltype(g_logHandler) logHandler) {
+    clsMMKV.def_static(
+        "initializeMMKV",
+        [](const string &rootDir, MMKVLogLevel logLevel, decltype(g_logHandler) logHandler) {
             if (logHandler) {
                 g_logHandler = std::move(logHandler);
                 MMKV::initializeMMKV(rootDir, logLevel, MyLogHandler);
             } else {
                 MMKV::initializeMMKV(rootDir, logLevel, nullptr);
             }
-        }, "must call this before getting any MMKV instance",
-                       py::arg("rootDir"), py::arg("logLevel") = MMKVLogNone, py::arg("log_handler") = nullptr);
+        },
+        "must call this before getting any MMKV instance", py::arg("rootDir"), py::arg("logLevel") = MMKVLogNone,
+        py::arg("log_handler") = nullptr);
 
     clsMMKV.def_static(
         "defaultMMKV",
@@ -150,34 +155,38 @@ PYBIND11_MODULE(mmkv, m) {
     // clsMMKV.def("set", py::overload_cast<bool, const string&>(&MMKV::set), py::arg("value"), py::arg("key"));
     clsMMKV.def("set", (bool (MMKV::*)(bool, const string &))(&MMKV::set), "encode a boolean value", py::arg("value"),
                 py::arg("key"));
-    clsMMKV.def("set", (bool (MMKV::*)(bool, const string &, uint32_t))(&MMKV::set), "encode a boolean value with expiration",
-                py::arg("value"), py::arg("key"), py::arg("expireDuration"));
-    clsMMKV.def("set", (bool (MMKV::*)(int32_t, const string &))(&MMKV::set), "encode an int32 value",
-                py::arg("value"), py::arg("key"));
-    clsMMKV.def("set", (bool (MMKV::*)(int32_t, const string &, uint32_t))(&MMKV::set), "encode an int32 value with expiration", py::arg("value"),
-                py::arg("key"), py::arg("expireDuration"));
+    clsMMKV.def("set", (bool (MMKV::*)(bool, const string &, uint32_t))(&MMKV::set),
+                "encode a boolean value with expiration", py::arg("value"), py::arg("key"), py::arg("expireDuration"));
+    clsMMKV.def("set", (bool (MMKV::*)(int32_t, const string &))(&MMKV::set), "encode an int32 value", py::arg("value"),
+                py::arg("key"));
+    clsMMKV.def("set", (bool (MMKV::*)(int32_t, const string &, uint32_t))(&MMKV::set),
+                "encode an int32 value with expiration", py::arg("value"), py::arg("key"), py::arg("expireDuration"));
     clsMMKV.def("set", (bool (MMKV::*)(uint32_t, const string &))(&MMKV::set), "encode an unsigned int32 value",
                 py::arg("value"), py::arg("key"));
-    clsMMKV.def("set", (bool (MMKV::*)(uint32_t, const string &, uint32_t))(&MMKV::set), "encode an unsigned int32 value with expiration",
-                py::arg("value"), py::arg("key"), py::arg("expireDuration"));
+    clsMMKV.def("set", (bool (MMKV::*)(uint32_t, const string &, uint32_t))(&MMKV::set),
+                "encode an unsigned int32 value with expiration", py::arg("value"), py::arg("key"),
+                py::arg("expireDuration"));
     clsMMKV.def("set", (bool (MMKV::*)(int64_t, const string &))(&MMKV::set), "encode an int64 value", py::arg("value"),
                 py::arg("key"));
-    clsMMKV.def("set", (bool (MMKV::*)(int64_t, const string &, uint32_t))(&MMKV::set), "encode an int64 value with expiration", py::arg("value"),
-                py::arg("key"), py::arg("expireDuration"));
+    clsMMKV.def("set", (bool (MMKV::*)(int64_t, const string &, uint32_t))(&MMKV::set),
+                "encode an int64 value with expiration", py::arg("value"), py::arg("key"), py::arg("expireDuration"));
     clsMMKV.def("set", (bool (MMKV::*)(uint64_t, const string &))(&MMKV::set), "encode an unsigned int64 value",
                 py::arg("value"), py::arg("key"));
-    clsMMKV.def("set", (bool (MMKV::*)(uint64_t, const string &, uint32_t))(&MMKV::set), "encode an unsigned int64 value with expiration",
-                py::arg("value"), py::arg("key"), py::arg("expireDuration"));
+    clsMMKV.def("set", (bool (MMKV::*)(uint64_t, const string &, uint32_t))(&MMKV::set),
+                "encode an unsigned int64 value with expiration", py::arg("value"), py::arg("key"),
+                py::arg("expireDuration"));
     //clsMMKV.def("set", (bool (MMKV::*)(float, const string &))(&MMKV::set), py::arg("value"), py::arg("key"));
     clsMMKV.def("set", (bool (MMKV::*)(double, const string &))(&MMKV::set), "encode a float/double value",
                 py::arg("value"), py::arg("key"));
-    clsMMKV.def("set", (bool (MMKV::*)(double, const string &, uint32_t))(&MMKV::set), "encode a float/double value with expiration",
-                py::arg("value"), py::arg("key"), py::arg("expireDuration"));
+    clsMMKV.def("set", (bool (MMKV::*)(double, const string &, uint32_t))(&MMKV::set),
+                "encode a float/double value with expiration", py::arg("value"), py::arg("key"),
+                py::arg("expireDuration"));
     //clsMMKV.def("set", (bool (MMKV::*)(const char*, const string&))(&MMKV::set), py::arg("value"), py::arg("key"));
     clsMMKV.def("set", (bool (MMKV::*)(const string &, const string &))(&MMKV::set),
                 "encode an UTF-8 String/bytes value", py::arg("value"), py::arg("key"));
     clsMMKV.def("set", (bool (MMKV::*)(const string &, const string &, uint32_t))(&MMKV::set),
-                "encode an UTF-8 String/bytes value with expiration", py::arg("value"), py::arg("key"), py::arg("expireDuration"));
+                "encode an UTF-8 String/bytes value with expiration", py::arg("value"), py::arg("key"),
+                py::arg("expireDuration"));
 #if PY_MAJOR_VERSION >= 3
     clsMMKV.def(
         "set", [](MMKV &kv, const py::bytes &value, const string &key) { return kv.set(pyBytes2MMBuffer(value), key); },
@@ -185,16 +194,19 @@ PYBIND11_MODULE(mmkv, m) {
     clsMMKV.def(
         "set",
         [](MMKV &kv, const py::bytes &value, const string &key, uint32_t expireDuration) {
-                    return kv.set(pyBytes2MMBuffer(value), key, expireDuration);
-                },
+            return kv.set(pyBytes2MMBuffer(value), key, expireDuration);
+        },
         "encode a bytes value with expiration", py::arg("value"), py::arg("key"), py::arg("expireDuration"));
 #endif
 
-    clsMMKV.def("getBool", &MMKV::getBool, "decode a boolean value", py::arg("key"), py::arg("defaultValue") = false, py::arg("hasValue") = nullptr);
-    clsMMKV.def("getInt", &MMKV::getInt32, "decode an int32 value", py::arg("key"), py::arg("defaultValue") = 0, py::arg("hasValue") = nullptr);
+    clsMMKV.def("getBool", &MMKV::getBool, "decode a boolean value", py::arg("key"), py::arg("defaultValue") = false,
+                py::arg("hasValue") = nullptr);
+    clsMMKV.def("getInt", &MMKV::getInt32, "decode an int32 value", py::arg("key"), py::arg("defaultValue") = 0,
+                py::arg("hasValue") = nullptr);
     clsMMKV.def("getUInt", &MMKV::getUInt32, "decode an unsigned int32 value", py::arg("key"),
                 py::arg("defaultValue") = 0, py::arg("hasValue") = nullptr);
-    clsMMKV.def("getLongInt", &MMKV::getInt64, "decode an int64 value", py::arg("key"), py::arg("defaultValue") = 0, py::arg("hasValue") = nullptr);
+    clsMMKV.def("getLongInt", &MMKV::getInt64, "decode an int64 value", py::arg("key"), py::arg("defaultValue") = 0,
+                py::arg("hasValue") = nullptr);
     clsMMKV.def("getLongUInt", &MMKV::getUInt64, "decode an unsigned int64 value", py::arg("key"),
                 py::arg("defaultValue") = 0, py::arg("hasValue") = nullptr);
     //clsMMKV.def("getFloat", &MMKV::getFloat, py::arg("key"), py::arg("defaultValue") = 0);
@@ -223,15 +235,15 @@ PYBIND11_MODULE(mmkv, m) {
         "decode a bytes value", py::arg("key"), py::arg("defaultValue") = py::bytes());
 
     clsMMKV.def("__contains__", &MMKV::containsKey, py::arg("key"));
-    clsMMKV.def("keys", &MMKV::allKeys);
+    clsMMKV.def("keys", &MMKV::allKeys, py::arg("filterExpire") = false);
 
-    clsMMKV.def("count", &MMKV::count);
+    clsMMKV.def("count", &MMKV::count, py::arg("filterExpire") = false);
     clsMMKV.def("totalSize", &MMKV::totalSize);
     clsMMKV.def("actualSize", &MMKV::actualSize);
 
     clsMMKV.def("remove", &MMKV::removeValueForKey, py::arg("key"));
     clsMMKV.def("remove", &MMKV::removeValuesForKeys, py::arg("keys"));
-    clsMMKV.def("clearAll", &MMKV::clearAll, "remove all key-values");
+    clsMMKV.def("clearAll", &MMKV::clearAll, py::arg("keepSpace") = false, "remove all key-values");
     clsMMKV.def("trim", &MMKV::trim, "call this method after lots of removing if you care about disk usage");
     clsMMKV.def("clearMemoryCache", &MMKV::clearMemoryCache, "call this method if you are facing memory-warning");
 
@@ -242,6 +254,9 @@ PYBIND11_MODULE(mmkv, m) {
     clsMMKV.def("enableAutoKeyExpire", &MMKV::enableAutoKeyExpire, py::arg("expireDurationInSecond"),
                 "turn on auto key expiration, passing 0 means never expire");
     clsMMKV.def("disableAutoKeyExpire", &MMKV::disableAutoKeyExpire, "turn off auto key expiration");
+
+    clsMMKV.def("enableCompareBeforeSet", &MMKV::enableCompareBeforeSet, "turn on compare before set/update");
+    clsMMKV.def("disableCompareBeforeSet", &MMKV::disableCompareBeforeSet, "turn off compare before set/update");
 
     clsMMKV.def("lock", &MMKV::lock, "get exclusive access, won't return until the lock is obtained");
     clsMMKV.def("unlock", &MMKV::unlock);
@@ -328,8 +343,8 @@ PYBIND11_MODULE(mmkv, m) {
             string *srcDirPtr = (srcDir.length() > 0) ? (string *) &srcDir : nullptr;
             return MMKV::backupOneToDirectory(mmapID, dstDir, srcDirPtr);
         },
-        "backup one MMKV instance from srcDir (default to the root dir of MMKV) to dstDir",
-        py::arg("mmapID"), py::arg("dstDir"), py::arg("srcDir") = string());
+        "backup one MMKV instance from srcDir (default to the root dir of MMKV) to dstDir", py::arg("mmapID"),
+        py::arg("dstDir"), py::arg("srcDir") = string());
 
     clsMMKV.def_static(
         "restoreOneFromDirectory",
@@ -337,8 +352,8 @@ PYBIND11_MODULE(mmkv, m) {
             string *dstDirPtr = (dstDir.length() > 0) ? (string *) &dstDir : nullptr;
             return MMKV::restoreOneFromDirectory(mmapID, srcDir, dstDirPtr);
         },
-        "restore one MMKV instance from srcDir to dstDir (default to the root dir of MMKV)",
-        py::arg("mmapID"), py::arg("srcDir"), py::arg("dstDir") = string());
+        "restore one MMKV instance from srcDir to dstDir (default to the root dir of MMKV)", py::arg("mmapID"),
+        py::arg("srcDir"), py::arg("dstDir") = string());
 
     clsMMKV.def_static(
         "backupAllToDirectory",
@@ -346,8 +361,8 @@ PYBIND11_MODULE(mmkv, m) {
             string *srcDirPtr = (srcDir.length() > 0) ? (string *) &srcDir : nullptr;
             return MMKV::backupAllToDirectory(dstDir, srcDirPtr);
         },
-        "backup all MMKV instance from srcDir (default to the root dir of MMKV) to dstDir",
-        py::arg("dstDir"), py::arg("srcDir") = string());
+        "backup all MMKV instance from srcDir (default to the root dir of MMKV) to dstDir", py::arg("dstDir"),
+        py::arg("srcDir") = string());
 
     clsMMKV.def_static(
         "restoreAllFromDirectory",
@@ -355,6 +370,15 @@ PYBIND11_MODULE(mmkv, m) {
             string *dstDirPtr = (dstDir.length() > 0) ? (string *) &dstDir : nullptr;
             return MMKV::restoreAllFromDirectory(srcDir, dstDirPtr);
         },
-        "restore all MMKV instance from srcDir to dstDir (default to the root dir of MMKV)",
-        py::arg("srcDir"), py::arg("dstDir") = string());
+        "restore all MMKV instance from srcDir to dstDir (default to the root dir of MMKV)", py::arg("srcDir"),
+        py::arg("dstDir") = string());
+
+    clsMMKV.def_static(
+        "removeStorage",
+        [](const string &mmapID, const string &rootDir) {
+            string *rootDirPtr = (rootDir.length() > 0) ? (string *) &rootDir : nullptr;
+            return MMKV::removeStorage(mmapID, rootDirPtr);
+        },
+        "remove the storage of the MMKV, including the data file & meta file (.crc)", py::arg("mmapID"),
+        py::arg("rootDir") = string());
 }

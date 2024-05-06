@@ -294,7 +294,8 @@ static void onContentChangedByOuterProcess(const std::string &mmapID) {
     }
 }
 
-MMKV_JNI jlong getMMKVWithID(JNIEnv *env, jobject, jstring mmapID, jint mode, jstring cryptKey, jstring rootPath) {
+MMKV_JNI jlong getMMKVWithID(JNIEnv *env, jobject, jstring mmapID, jint mode, jstring cryptKey, jstring rootPath,
+                             jlong expectedCapacity) {
     MMKV *kv = nullptr;
     if (!mmapID) {
         return (jlong) kv;
@@ -307,9 +308,9 @@ MMKV_JNI jlong getMMKVWithID(JNIEnv *env, jobject, jstring mmapID, jint mode, js
         if (crypt.length() > 0) {
             if (rootPath) {
                 string path = jstring2string(env, rootPath);
-                kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, &crypt, &path);
+                kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, &crypt, &path, expectedCapacity);
             } else {
-                kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, &crypt, nullptr);
+                kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, &crypt, nullptr, expectedCapacity);
             }
             done = true;
         }
@@ -317,9 +318,9 @@ MMKV_JNI jlong getMMKVWithID(JNIEnv *env, jobject, jstring mmapID, jint mode, js
     if (!done) {
         if (rootPath) {
             string path = jstring2string(env, rootPath);
-            kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, nullptr, &path);
+            kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, nullptr, &path, expectedCapacity);
         } else {
-            kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, nullptr, nullptr);
+            kv = MMKV::mmkvWithID(str, DEFAULT_MMAP_SIZE, (MMKVMode) mode, nullptr, nullptr, expectedCapacity);
         }
     }
 
@@ -645,8 +646,9 @@ MMKV_JNI jbyteArray decodeBytes(JNIEnv *env, jobject obj, jlong handle, jstring 
     MMKV *kv = reinterpret_cast<MMKV *>(handle);
     if (kv && oKey) {
         string key = jstring2string(env, oKey);
-        MMBuffer value = kv->getBytes(key);
-        if (value.length() > 0) {
+        mmkv::MMBuffer value;
+        auto hasValue = kv->getBytes(key, value);
+        if (hasValue) {
             jbyteArray result = env->NewByteArray(value.length());
             env->SetByteArrayRegion(result, 0, value.length(), (const jbyte *) value.getPtr());
             return result;
@@ -655,10 +657,10 @@ MMKV_JNI jbyteArray decodeBytes(JNIEnv *env, jobject obj, jlong handle, jstring 
     return nullptr;
 }
 
-MMKV_JNI jobjectArray allKeys(JNIEnv *env, jobject instance) {
-    MMKV *kv = getMMKV(env, instance);
+MMKV_JNI jobjectArray allKeys(JNIEnv *env, jobject instance, jlong handle, jboolean filterExpire) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
     if (kv) {
-        vector<string> keys = kv->allKeys();
+        vector<string> keys = kv->allKeys((bool) filterExpire);
         return vector2jarray(env, keys);
     }
     return nullptr;
@@ -673,10 +675,10 @@ MMKV_JNI jboolean containsKey(JNIEnv *env, jobject instance, jlong handle, jstri
     return (jboolean) false;
 }
 
-MMKV_JNI jlong count(JNIEnv *env, jobject instance, jlong handle) {
+MMKV_JNI jlong count(JNIEnv *env, jobject instance, jlong handle, jboolean filterExpire) {
     MMKV *kv = reinterpret_cast<MMKV *>(handle);
     if (kv) {
-        jlong size = kv->count();
+        jlong size = kv->count((bool) filterExpire);
         return size;
     }
     return 0;
@@ -740,6 +742,19 @@ MMKV_JNI jboolean isFileValid(JNIEnv *env, jclass type, jstring oMmapID, jstring
         } else {
             auto root = jstring2string(env, rootPath);
             return (jboolean) MMKV::isFileValid(mmapID, &root);
+        }
+    }
+    return (jboolean) false;
+}
+
+MMKV_JNI jboolean removeStorage(JNIEnv *env, jclass type, jstring oMmapID, jstring rootPath) {
+    if (oMmapID) {
+        string mmapID = jstring2string(env, oMmapID);
+        if (!rootPath) {
+            return (jboolean) MMKV::removeStorage(mmapID, nullptr);
+        } else {
+            auto root = jstring2string(env, rootPath);
+            return (jboolean) MMKV::removeStorage(mmapID, &root);
         }
     }
     return (jboolean) false;
@@ -1013,6 +1028,51 @@ MMKV_JNI jboolean disableAutoExpire(JNIEnv *env, jobject instance) {
     return (jboolean) false;
 }
 
+MMKV_JNI void enableCompareBeforeSet(JNIEnv *env, jobject instance) {
+    MMKV *kv = getMMKV(env, instance);
+    if (kv) {
+        kv->enableCompareBeforeSet();
+    }
+}
+
+MMKV_JNI void disableCompareBeforeSet(JNIEnv *env, jobject instance) {
+    MMKV *kv = getMMKV(env, instance);
+    if (kv) {
+        kv->disableCompareBeforeSet();
+    }
+}
+
+MMKV_JNI bool isCompareBeforeSetEnabled(JNIEnv *env, jobject instance) {
+    MMKV *kv = getMMKV(env, instance);
+    if (kv) {
+        return kv->isCompareBeforeSetEnabled();
+    }
+    return false;
+}
+
+MMKV_JNI bool isEncryptionEnabled(JNIEnv *env, jobject instance) {
+    MMKV *kv = getMMKV(env, instance);
+    if (kv) {
+        return kv->isEncryptionEnabled();
+    }
+    return false;
+}
+
+MMKV_JNI bool isExpirationEnabled(JNIEnv *env, jobject instance) {
+    MMKV *kv = getMMKV(env, instance);
+    if (kv) {
+        return kv->isExpirationEnabled();
+    }
+    return false;
+}
+
+MMKV_JNI void clearAllWithKeepingSpace(JNIEnv *env, jobject instance) {
+    MMKV *kv = getMMKV(env, instance);
+    if (kv) {
+        kv->clearAll(true);
+    }
+}
+
 } // namespace mmkv
 
 static JNINativeMethod g_methods[] = {
@@ -1028,7 +1088,7 @@ static JNINativeMethod g_methods[] = {
     {"lock", "()V", (void *) mmkv::lock},
     {"unlock", "()V", (void *) mmkv::unlock},
     {"tryLock", "()Z", (void *) mmkv::tryLock},
-    {"allKeys", "()[Ljava/lang/String;", (void *) mmkv::allKeys},
+    {"allKeys", "(JZ)[Ljava/lang/String;", (void *) mmkv::allKeys},
     {"removeValuesForKeys", "([Ljava/lang/String;)V", (void *) mmkv::removeValuesForKeys},
     {"clearAll", "()V", (void *) mmkv::clearAll},
     {"trim", "()V", (void *) mmkv::trim},
@@ -1036,11 +1096,12 @@ static JNINativeMethod g_methods[] = {
     {"clearMemoryCache", "()V", (void *) mmkv::clearMemoryCache},
     {"sync", "(Z)V", (void *) mmkv::sync},
     {"isFileValid", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *) mmkv::isFileValid},
+    {"removeStorage", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *) mmkv::removeStorage},
     {"ashmemFD", "()I", (void *) mmkv::ashmemFD},
     {"ashmemMetaFD", "()I", (void *) mmkv::ashmemMetaFD},
     //{"jniInitialize", "(Ljava/lang/String;Ljava/lang/String;I)V", (void *) mmkv::jniInitialize},
     {"jniInitialize", "(Ljava/lang/String;Ljava/lang/String;IZ)V", (void *) mmkv::jniInitialize_2},
-    {"getMMKVWithID", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)J", (void *) mmkv::getMMKVWithID},
+    {"getMMKVWithID", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;J)J", (void *) mmkv::getMMKVWithID},
     {"getMMKVWithIDAndSize", "(Ljava/lang/String;IILjava/lang/String;)J", (void *) mmkv::getMMKVWithIDAndSize},
     {"getDefaultMMKV", "(ILjava/lang/String;)J", (void *) mmkv::getDefaultMMKV},
     {"getMMKVWithAshmemFD", "(Ljava/lang/String;IILjava/lang/String;)J", (void *) mmkv::getMMKVWithAshmemFD},
@@ -1069,7 +1130,7 @@ static JNINativeMethod g_methods[] = {
     {"encodeBytes_2", "(JLjava/lang/String;[BI)Z", (void *) mmkv::encodeBytes_2},
     {"decodeBytes", "(JLjava/lang/String;)[B", (void *) mmkv::decodeBytes},
     {"containsKey", "(JLjava/lang/String;)Z", (void *) mmkv::containsKey},
-    {"count", "(J)J", (void *) mmkv::count},
+    {"count", "(JZ)J", (void *) mmkv::count},
     {"totalSize", "(J)J", (void *) mmkv::totalSize},
     {"actualSize", "(J)J", (void *) mmkv::actualSize},
     {"removeValueForKey", "(JLjava/lang/String;)V", (void *) mmkv::removeValueForKey},
@@ -1088,6 +1149,12 @@ static JNINativeMethod g_methods[] = {
     {"restoreAllFromDirectory", "(Ljava/lang/String;)J", (void *) mmkv::restoreAll},
     {"enableAutoKeyExpire", "(I)Z", (void *) mmkv::enableAutoExpire},
     {"disableAutoKeyExpire", "()Z", (void *) mmkv::disableAutoExpire},
+    {"nativeEnableCompareBeforeSet", "()V", (void *) mmkv::enableCompareBeforeSet},
+    {"disableCompareBeforeSet", "()V", (void *) mmkv::disableCompareBeforeSet},
+    {"isCompareBeforeSetEnabled", "()Z", (void *) mmkv::isCompareBeforeSetEnabled},
+    {"isEncryptionEnabled", "()Z", (void *) mmkv::isEncryptionEnabled},
+    {"isExpirationEnabled", "()Z", (void *) mmkv::isExpirationEnabled},
+    {"clearAllWithKeepingSpace", "()V", (void *) mmkv::clearAllWithKeepingSpace},
 };
 
 static int registerNativeMethods(JNIEnv *env, jclass cls) {

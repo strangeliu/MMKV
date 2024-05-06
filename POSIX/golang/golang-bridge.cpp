@@ -47,7 +47,8 @@ MMKV_EXPORT void onExit() {
     MMKV::onExit();
 }
 
-MMKV_EXPORT void *getMMKVWithID(GoStringWrap mmapID, int32_t mode, GoStringWrap cryptKey, GoStringWrap rootPath) {
+MMKV_EXPORT void *getMMKVWithID(GoStringWrap mmapID, int32_t mode, GoStringWrap cryptKey, 
+                                GoStringWrap rootPath, uint64_t expectedCapacity) {
     MMKV *kv = nullptr;
     if (!mmapID.ptr) {
         return kv;
@@ -60,9 +61,9 @@ MMKV_EXPORT void *getMMKVWithID(GoStringWrap mmapID, int32_t mode, GoStringWrap 
         if (crypt.length() > 0) {
             if (rootPath.ptr) {
                 auto path = string(rootPath.ptr, rootPath.length);
-                kv = MMKV::mmkvWithID(str, (MMKVMode) mode, &crypt, &path);
+                kv = MMKV::mmkvWithID(str, (MMKVMode) mode, &crypt, &path, expectedCapacity);
             } else {
-                kv = MMKV::mmkvWithID(str, (MMKVMode) mode, &crypt, nullptr);
+                kv = MMKV::mmkvWithID(str, (MMKVMode) mode, &crypt, nullptr, expectedCapacity);
             }
             done = true;
         }
@@ -70,9 +71,9 @@ MMKV_EXPORT void *getMMKVWithID(GoStringWrap mmapID, int32_t mode, GoStringWrap 
     if (!done) {
         if (rootPath.ptr) {
             auto path = string(rootPath.ptr, rootPath.length);
-            kv = MMKV::mmkvWithID(str, (MMKVMode) mode, nullptr, &path);
+            kv = MMKV::mmkvWithID(str, (MMKVMode) mode, nullptr, &path, expectedCapacity);
         } else {
-            kv = MMKV::mmkvWithID(str, (MMKVMode) mode, nullptr, nullptr);
+            kv = MMKV::mmkvWithID(str, (MMKVMode) mode, nullptr, nullptr, expectedCapacity);
         }
     }
 
@@ -389,12 +390,24 @@ MMKV_EXPORT void checkReSetCryptKey(void *handle, GoStringWrap oKey) {
     }
 }
 
+#    else // fix cgo cannot find function reference.
+
+MMKV_EXPORT bool reKey(void *handle, GoStringWrap oKey) {
+    return false;
+}
+
+MMKV_EXPORT void *cryptKey(void *handle, uint32_t *lengthPtr) {
+    return nullptr;
+}
+
+MMKV_EXPORT void checkReSetCryptKey(void *handle, GoStringWrap oKey) {}
+
 #    endif // MMKV_DISABLE_CRYPT
 
-MMKV_EXPORT GoStringWrap *allKeys(void *handle, uint64_t *lengthPtr) {
+MMKV_EXPORT GoStringWrap *allKeys(void *handle, uint64_t *lengthPtr, bool filterExpire) {
     MMKV *kv = static_cast<MMKV *>(handle);
     if (kv) {
-        auto keys = kv->allKeys();
+        auto keys = kv->allKeys(filterExpire);
         if (!keys.empty()) {
             auto keyArray = (GoStringWrap *) calloc(keys.size(), sizeof(GoStringWrap));
             if (!keyArray) {
@@ -426,10 +439,10 @@ MMKV_EXPORT bool containsKey(void *handle, GoStringWrap oKey) {
     return false;
 }
 
-MMKV_EXPORT uint64_t count(void *handle) {
+MMKV_EXPORT uint64_t count(void *handle, bool filterExpire) {
     MMKV *kv = static_cast<MMKV *>(handle);
     if (kv) {
-        return kv->count();
+        return kv->count(filterExpire);
     }
     return 0;
 }
@@ -475,10 +488,10 @@ MMKV_EXPORT void removeValuesForKeys(void *handle, GoStringWrap *keyArray, uint6
     }
 }
 
-MMKV_EXPORT void clearAll(void *handle) {
+MMKV_EXPORT void clearAll(void *handle, bool keepSpace) {
     MMKV *kv = static_cast<MMKV *>(handle);
     if (kv) {
-        kv->clearAll();
+        kv->clearAll(keepSpace);
     }
 }
 
@@ -586,6 +599,22 @@ MMKV_EXPORT bool disableAutoExpire(void *handle) {
     return false;
 }
 
+MMKV_EXPORT bool enableCompareBeforeSet(void *handle) {
+    MMKV *kv = static_cast<MMKV *>(handle);
+    if (kv) {
+        return kv->enableCompareBeforeSet();
+    }
+    return false;
+}
+
+MMKV_EXPORT bool disableCompareBeforeSet(void *handle) {
+    MMKV *kv = static_cast<MMKV *>(handle);
+    if (kv) {
+        return kv->disableCompareBeforeSet();
+    }
+    return false;
+}
+
 extern "C" void myLogHandler(int64_t level, GoStringWrap file, int64_t line, GoStringWrap function, GoStringWrap message);
 
 void cLogHandler(MMKVLogLevel level, const char *file, int line, const char *function, const std::string &message) {
@@ -634,6 +663,18 @@ void setWantsContentChangeHandle(bool errorHandle) {
     } else {
         MMKV::unRegisterContentChangeHandler();
     }
+}
+
+MMKV_EXPORT bool removeStorage(GoStringWrap_t mmapID, GoStringWrap_t rootPath) {
+    if (!mmapID.ptr) {
+        return false;
+    }
+    auto id = string(mmapID.ptr, mmapID.length);
+    if (rootPath.ptr) {
+        auto path = string(rootPath.ptr, rootPath.length);
+        return MMKV::removeStorage(id, &path);
+    }
+    return MMKV::removeStorage(id, nullptr);
 }
 
 #endif // CGO

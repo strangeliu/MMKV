@@ -35,6 +35,7 @@
 #    include <sys/file.h>
 #    include <dirent.h>
 #    include <cstring>
+#    include <unistd.h>
 
 using namespace std;
 
@@ -49,8 +50,8 @@ File::File(MMKVPath_t path, OpenFlag flag) : m_path(std::move(path)), m_fd(-1), 
     open();
 }
 
-MemoryFile::MemoryFile(MMKVPath_t path) : m_diskFile(std::move(path), OpenFlag::ReadWrite | OpenFlag::Create), m_ptr(nullptr), m_size(0) {
-    reloadFromFile();
+MemoryFile::MemoryFile(MMKVPath_t path, size_t expectedCapacity) : m_diskFile(std::move(path), OpenFlag::ReadWrite | OpenFlag::Create), m_ptr(nullptr), m_size(0) {
+    reloadFromFile(expectedCapacity);
 }
 #    endif // !defined(MMKV_ANDROID)
 
@@ -154,6 +155,16 @@ bool MemoryFile::truncate(size_t size) {
         if (!zeroFillFile(m_diskFile.m_fd, oldSize, m_size - oldSize)) {
             MMKVError("fail to zeroFile [%s] to size %zu, %s", m_diskFile.m_path.c_str(), m_size, strerror(errno));
             m_size = oldSize;
+
+            // redo ftruncate to its previous size
+            int status = ::ftruncate(m_diskFile.m_fd, static_cast<off_t>(m_size));
+            if (status != 0) {
+                MMKVError("failed to truncate back [%s] to size %zu, %s", m_diskFile.m_path.c_str(), m_size, strerror(errno));
+            } else {
+                MMKVError("success to truncate [%s] back to size %zu", m_diskFile.m_path.c_str(), m_size);
+                MMKVError("after truncate, file size = %zu", getActualFileSize());
+            }
+
             return false;
         }
     }
@@ -182,17 +193,18 @@ bool MemoryFile::msync(SyncFlag syncFlag) {
 }
 
 bool MemoryFile::mmap() {
+    auto oldPtr = m_ptr;
     m_ptr = (char *) ::mmap(m_ptr, m_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_diskFile.m_fd, 0);
     if (m_ptr == MAP_FAILED) {
         MMKVError("fail to mmap [%s], %s", m_diskFile.m_path.c_str(), strerror(errno));
         m_ptr = nullptr;
         return false;
     }
-
+    MMKVInfo("mmap to address [%p], oldPtr [%p], [%s]", m_ptr, oldPtr, m_diskFile.m_path.c_str());
     return true;
 }
 
-void MemoryFile::reloadFromFile() {
+void MemoryFile::reloadFromFile(size_t expectedCapacity) {
 #    ifdef MMKV_ANDROID
     if (m_fileType == MMFILE_TYPE_ASHMEM) {
         return;
@@ -201,20 +213,25 @@ void MemoryFile::reloadFromFile() {
     if (isFileValid()) {
         MMKVWarning("calling reloadFromFile while the cache [%s] is still valid", m_diskFile.m_path.c_str());
         MMKV_ASSERT(0);
-        clearMemoryCache();
+        doCleanMemoryCache(false);
     }
 
     if (!m_diskFile.open()) {
         MMKVError("fail to open:%s, %s", m_diskFile.m_path.c_str(), strerror(errno));
     } else {
         FileLock fileLock(m_diskFile.m_fd);
-        InterProcessLock lock(&fileLock, ExclusiveLockType);
+        InterProcessLock lock(&fileLock, SharedLockType);
         SCOPED_LOCK(&lock);
 
         mmkv::getFileSize(m_diskFile.m_fd, m_size);
+        size_t expectedSize = std::max<size_t>(DEFAULT_MMAP_SIZE, roundUp<size_t>(expectedCapacity, DEFAULT_MMAP_SIZE));
         // round up to (n * pagesize)
-        if (m_size < DEFAULT_MMAP_SIZE || (m_size % DEFAULT_MMAP_SIZE != 0)) {
-            size_t roundSize = ((m_size / DEFAULT_MMAP_SIZE) + 1) * DEFAULT_MMAP_SIZE;
+        if (m_size < expectedSize || (m_size % DEFAULT_MMAP_SIZE != 0)) {
+            InterProcessLock exclusiveLock(&fileLock, ExclusiveLockType);
+            SCOPED_LOCK(&exclusiveLock);
+
+            size_t roundSize = ((m_size / DEFAULT_MMAP_SIZE) + 1) * DEFAULT_MMAP_SIZE;;
+            roundSize = std::max<size_t>(expectedSize, roundSize);
             truncate(roundSize);
         } else {
             auto ret = mmap();
@@ -250,10 +267,10 @@ bool isFileExist(const string &nsFilePath) {
         return false;
     }
 
-    struct stat temp = {};
-    return lstat(nsFilePath.c_str(), &temp) == 0;
+    return access(nsFilePath.c_str(), F_OK) == 0;
 }
 
+#ifndef MMKV_APPLE
 extern bool mkPath(const MMKVPath_t &str) {
     char *path = strdup(str.c_str());
 
@@ -271,21 +288,38 @@ extern bool mkPath(const MMKVPath_t &str) {
         if (stat(path, &sb) != 0) {
             if (errno != ENOENT || mkdir(path, 0777) != 0) {
                 MMKVWarning("%s : %s", path, strerror(errno));
-                free(path);
-                return false;
+                // there's report that some Android devices might not have access permission on parent dir
+                if (done) {
+                    free(path);
+                    return false;
+                }
+                goto LContinue;
             }
         } else if (!S_ISDIR(sb.st_mode)) {
             MMKVWarning("%s: %s", path, strerror(ENOTDIR));
             free(path);
             return false;
         }
-
+LContinue:
         *slash = '/';
     }
     free(path);
 
     return true;
 }
+#else
+// avoid using so-called privacy API
+extern bool mkPath(const MMKVPath_t &str) {
+    auto path = [NSString stringWithUTF8String:str.c_str()];
+    NSError *error = nil;
+    auto ret = [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&error];
+    if (!ret) {
+        MMKVWarning("%s", error.localizedDescription.UTF8String);
+        return false;
+    }
+    return true;
+}
+#endif
 
 MMBuffer *readWholeFile(const MMKVPath_t &path) {
     MMBuffer *buffer = nullptr;
@@ -339,6 +373,7 @@ bool zeroFillFile(int fd, size_t startPos, size_t size) {
     return true;
 }
 
+#ifndef MMKV_APPLE
 bool getFileSize(int fd, size_t &size) {
     struct stat st = {};
     if (fstat(fd, &st) != -1) {
@@ -347,6 +382,23 @@ bool getFileSize(int fd, size_t &size) {
     }
     return false;
 }
+#else
+// avoid using so-called privacy API
+bool getFileSize(int fd, size_t &size) {
+    auto cur = lseek(fd, 0, SEEK_CUR);
+    if (cur == -1) {
+        return false;
+    }
+    auto end = lseek(fd, 0, SEEK_END);
+    if (end == -1) {
+        return false;
+    }
+    size = (size_t) end;
+
+    lseek(fd, cur, SEEK_SET);
+    return true;
+}
+#endif
 
 size_t getPageSize() {
     return static_cast<size_t>(getpagesize());

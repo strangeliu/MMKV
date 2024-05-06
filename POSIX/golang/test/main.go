@@ -20,7 +20,8 @@ func main() {
 	mmkv.RegisterErrorHandler(errorHandler)
 	// you can get notify content change by other process (not in realtime)
 	mmkv.RegisterContentChangeHandler(contentChangeNotify)
-
+       
+	testExpectedCapacity()
 	functionalTest()
 	testReKey()
 
@@ -28,6 +29,8 @@ func main() {
 	testBackup()
 	testRestore()
 	testAutoExpire()
+	testCompareBeforeSet()
+	testRemoveStorage()
 }
 
 func functionalTest() {
@@ -178,6 +181,33 @@ func testBackup() {
 	fmt.Println("backup all count: ", count)
 }
 
+func testExpectedCapacity() {
+    key := "key0"
+    value := "🏊🏻®4️⃣🐅_"
+    dataLen := 10000
+    for i := 0; i < dataLen; i++ {
+        value = value + string('0')
+    }
+    fmt.Println("value size = ", len(value))
+    expectedSize := uint64(len(key) + len(value))
+    // if we know exactly the sizes of key and value, set expectedCapacity for performance improvement
+    kv := mmkv.MMKVWithIDAndExpectedCapacity("expectedCapacityTest0", expectedSize)
+    // 0 times expand
+    kv.SetString(value, key)
+//     fmt.Println("string =", bytes.Count([]byte(kv.GetString("key0")), nil))
+
+    count := 10
+    expectedSize1 := expectedSize * uint64(count)
+    fmt.Println("expectedSize1 =", expectedSize1)
+    kv1 := mmkv.MMKVWithIDAndExpectedCapacity("expectedCapacityTest1", expectedSize1)
+    for i := 0; i < count; i++ {
+        key := "key" + string(i)
+        // 0 times expand
+        kv1.SetString(value, key)
+    }
+
+}
+
 func testRestore() {
 	rootDir := "/tmp/mmkv_backup"
 	mmapID := "test/Encrypt"
@@ -208,7 +238,7 @@ func testRestore() {
 
 func testAutoExpire()  {
 	kv := mmkv.MMKVWithID("testAutoExpire")
-	kv.ClearAll()
+	kv.ClearAllKeepSpace()
 	kv.Trim()
 	kv.DisableAutoKeyExpire()
 
@@ -227,6 +257,81 @@ func testAutoExpire()  {
 	time.Sleep(2 * time.Second)
 	fmt.Println("contains never_expire_key_1:", kv.Contains("never_expire_key_1"))
 	fmt.Println("contains auto_expire_key_1:", kv.Contains("auto_expire_key_1"))
+	fmt.Println("count non expire keys", kv.CountNonExpiredKeys())
+	fmt.Println("all non expire keys", kv.AllNonExpireKeys())
+}
+
+func testCompareBeforeSet() {
+    kv := mmkv.MMKVWithID("testCompareBeforeSet")
+    kv.EnableCompareBeforeSet()
+    kv.SetString("extraValue", "extraKey")
+
+    key := ""
+    {
+        key = "bool"
+        kv.SetBool(true, key)
+        fmt.Println("testCompareBeforeSet: bool value = ", kv.GetBool(key))
+        actualSize1 := kv.ActualSize()
+        fmt.Println("testCompareBeforeSet: actualSize = ", actualSize1)
+        fmt.Println("testCompareBeforeSet: bool value = ", kv.GetBool(key))
+        kv.SetBool(true, key)
+        actualSize2 := kv.ActualSize()
+        fmt.Println("testCompareBeforeSet: actualSize2 = ", actualSize2)
+        if actualSize1 != actualSize2 {
+            panic("size not match")
+        }
+        kv.SetBool(false, key)
+        fmt.Println("testCompareBeforeSet: bool value = ", kv.GetBool(key))
+        if kv.GetBool(key) != false {
+            panic("value not update")
+        }
+    }
+
+    s1 := "🏊🏻®hhh4️⃣🐅_yyy"
+    s2 := "0aA🏊🏻®hhh4️⃣🐅_zzz"
+    {
+        key = "string"
+        kv.SetString(s1, key)
+        resultString := kv.GetString(key)
+        fmt.Println("testCompareBeforeSet: string = ", resultString)
+        actualSize1 := kv.ActualSize()
+        fmt.Println("testCompareBeforeSet: actualSize = ", actualSize1)
+        resultString = kv.GetString(key)
+        fmt.Println("testCompareBeforeSet: string = ", resultString)
+        kv.SetString(s1, key)
+        actualSize2 := kv.ActualSize()
+        if actualSize1 != actualSize2 {
+            panic("size not match")
+        }
+        kv.SetString(s2, key)
+        resultString = kv.GetString(key)
+        fmt.Println("testCompareBeforeSet: string = ", resultString)
+        if resultString != s2 {
+            panic("value not update")
+        }
+    }
+
+    kv.DisableCompareBeforeSet()
+}
+
+func testRemoveStorage()  {
+	kv := mmkv.MMKVWithIDAndMode("test_remove", mmkv.MMKV_MULTI_PROCESS)
+	kv.SetBool(true, "bool")
+
+	mmkv.RemoveStorage("test_remove")
+	kv = mmkv.MMKVWithIDAndMode("test_remove", mmkv.MMKV_MULTI_PROCESS)
+	if kv.Count() != 0 {
+	    panic("storage not successfully remove")
+	}
+
+	kv = mmkv.MMKVWithIDAndMode("test_remove/sg", mmkv.MMKV_SINGLE_PROCESS)
+	kv.SetBool(true, "bool")
+
+	mmkv.RemoveStorage("test_remove/sg")
+	kv = mmkv.MMKVWithIDAndMode("test_remove/sg", mmkv.MMKV_SINGLE_PROCESS)
+	if kv.Count() != 0 {
+	    panic("storage not successfully remove")
+	}
 }
 
 func logHandler(level int, file string, line int, function string, message string) {

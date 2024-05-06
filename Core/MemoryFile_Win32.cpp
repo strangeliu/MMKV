@@ -94,12 +94,12 @@ size_t File::getActualFileSize() const {
     return size;
 }
 
-MemoryFile::MemoryFile(MMKVPath_t path)
+MemoryFile::MemoryFile(MMKVPath_t path, size_t expectedCapacity)
     : m_diskFile(std::move(path), OpenFlag::ReadWrite | OpenFlag::Create)
     , m_fileMapping(nullptr)
     , m_ptr(nullptr)
     , m_size(0) {
-    reloadFromFile();
+    reloadFromFile(expectedCapacity);
 }
 
 bool MemoryFile::truncate(size_t size) {
@@ -178,12 +178,13 @@ bool MemoryFile::mmap() {
             MMKVError("fail to mmap [%ls], %d", m_diskFile.m_path.c_str(), GetLastError());
             return false;
         }
+        MMKVInfo("mmap to address [%p], [%ls]", m_ptr, m_diskFile.m_path.c_str());
     }
 
     return true;
 }
 
-void MemoryFile::reloadFromFile() {
+void MemoryFile::reloadFromFile(size_t expectedCapacity) {
     if (isFileValid()) {
         MMKVWarning("calling reloadFromFile while the cache [%ls] is still valid", m_diskFile.m_path.c_str());
         assert(0);
@@ -196,9 +197,11 @@ void MemoryFile::reloadFromFile() {
         SCOPED_LOCK(&lock);
 
         mmkv::getFileSize(m_diskFile.getFd(), m_size);
+        size_t expectedSize = std::max<size_t>(DEFAULT_MMAP_SIZE, roundUp<size_t>(expectedCapacity, DEFAULT_MMAP_SIZE));
         // round up to (n * pagesize)
-        if (m_size < DEFAULT_MMAP_SIZE || (m_size % DEFAULT_MMAP_SIZE != 0)) {
-            size_t roundSize = ((m_size / DEFAULT_MMAP_SIZE) + 1) * DEFAULT_MMAP_SIZE;
+        if (m_size < expectedSize || (m_size % DEFAULT_MMAP_SIZE != 0)) {
+            size_t roundSize = ((m_size / DEFAULT_MMAP_SIZE) + 1) * DEFAULT_MMAP_SIZE;;
+            roundSize = std::max<size_t>(expectedSize, roundSize);
             truncate(roundSize);
         } else {
             auto ret = mmap();
@@ -279,7 +282,7 @@ MMBuffer *readWholeFile(const MMKVPath_t &nsFilePath) {
             buffer = new MMBuffer(static_cast<size_t>(fileLength));
             SetFilePointer(fd, 0, 0, FILE_BEGIN);
             DWORD readSize = 0;
-            if (ReadFile(fd, buffer->getPtr(), fileLength, &readSize, nullptr)) {
+            if (ReadFile(fd, buffer->getPtr(), (DWORD) fileLength, &readSize, nullptr)) {
                 //fileSize = readSize;
             } else {
                 MMKVWarning("fail to read %ls: %d", nsFilePath.c_str(), GetLastError());
@@ -320,7 +323,7 @@ bool zeroFillFile(MMKVFileHandle_t file, size_t startPos, size_t size) {
     }
     if (size > 0) {
         DWORD bytesWritten = 0;
-        if (!WriteFile(file, zeros, size, &bytesWritten, nullptr)) {
+        if (!WriteFile(file, zeros, (DWORD) size, &bytesWritten, nullptr)) {
             MMKVError("fail to write fd[%p], error:%d", file, GetLastError());
             return false;
         }
@@ -404,7 +407,7 @@ bool copyFileContent(const MMKVPath_t &srcPath, MMKVFileHandle_t dstFD, bool nee
     // the Win32 platform don't have sendfile()/fcopyfile() equivalent, do it the hard way
     while (true) {
         DWORD sizeRead = 0;
-        if (!ReadFile(srcFile.getFd(), buffer, bufferSize, &sizeRead, nullptr)) {
+        if (!ReadFile(srcFile.getFd(), buffer, (DWORD) bufferSize, &sizeRead, nullptr)) {
             MMKVError("fail to read %ls: %d", srcPath.c_str(), GetLastError());
             goto errorOut;
         }

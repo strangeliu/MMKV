@@ -20,7 +20,9 @@
 
 #import "MMKVHandler.h"
 
-#define OUT
+#ifndef MMKV_OUT
+#define MMKV_OUT
+#endif
 
 typedef NS_ENUM(NSUInteger, MMKVMode) {
     MMKVSingleProcess = 0x1,
@@ -81,12 +83,21 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)mmkvWithID:(NSString *)mmapID NS_SWIFT_NAME(init(mmapID:));
 
 /// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
+/// @param expectedCapacity the file size you expected when opening or creating file
++ (nullable instancetype)mmkvWithID:(NSString *)mmapID expectedCapacity:(size_t)expectedCapacity NS_SWIFT_NAME(init(mmapID:expectedCapacity:));
+
+/// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
 /// @param mode MMKVMultiProcess for multi-process MMKV
 + (nullable instancetype)mmkvWithID:(NSString *)mmapID mode:(MMKVMode)mode NS_SWIFT_NAME(init(mmapID:mode:));
 
 /// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
 /// @param cryptKey 16 bytes at most
 + (nullable instancetype)mmkvWithID:(NSString *)mmapID cryptKey:(nullable NSData *)cryptKey NS_SWIFT_NAME(init(mmapID:cryptKey:));
+
+/// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
+/// @param cryptKey 16 bytes at most
+/// @param expectedCapacity the file size you expected when opening or creating file
++ (nullable instancetype)mmkvWithID:(NSString *)mmapID cryptKey:(nullable NSData *)cryptKey expectedCapacity:(size_t)expectedCapacity NS_SWIFT_NAME(init(mmapID:cryptKey:expectedCapacity:));
 
 /// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
 /// @param cryptKey 16 bytes at most
@@ -102,6 +113,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)mmkvWithID:(NSString *)mmapID rootPath:(nullable NSString *)rootPath NS_SWIFT_NAME(init(mmapID:rootPath:));
 
 /// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
+/// @param rootPath custom path of the file, `NSDocumentDirectory/mmkv` by default
+/// @param expectedCapacity the file size you expected when opening or creating file
++ (nullable instancetype)mmkvWithID:(NSString *)mmapID rootPath:(nullable NSString *)rootPath expectedCapacity:(size_t)expectedCapacity NS_SWIFT_NAME(init(mmapID:rootPath:expectedCapacity:));
+
+/// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
 /// @param cryptKey 16 bytes at most
 /// @param relativePath custom path of the file, `NSDocumentDirectory/mmkv` by default
 + (nullable instancetype)mmkvWithID:(NSString *)mmapID cryptKey:(nullable NSData *)cryptKey relativePath:(nullable NSString *)relativePath NS_SWIFT_NAME(init(mmapID:cryptKey:relativePath:)) __attribute__((deprecated("use +mmkvWithID:cryptKey:rootPath: instead")));
@@ -110,6 +126,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param cryptKey 16 bytes at most
 /// @param rootPath custom path of the file, `NSDocumentDirectory/mmkv` by default
 + (nullable instancetype)mmkvWithID:(NSString *)mmapID cryptKey:(nullable NSData *)cryptKey rootPath:(nullable NSString *)rootPath NS_SWIFT_NAME(init(mmapID:cryptKey:rootPath:));
+
+/// @param mmapID any unique ID (com.tencent.xin.pay, etc), if you want a per-user mmkv, you could merge user-id within mmapID
+/// @param cryptKey 16 bytes at most
+/// @param rootPath custom path of the file, `NSDocumentDirectory/mmkv` by default
+/// @param expectedCapacity the file size you expected when opening or creating file
++ (nullable instancetype)mmkvWithID:(NSString *)mmapID cryptKey:(nullable NSData *)cryptKey rootPath:(nullable NSString *)rootPath expectedCapacity:(size_t)expectedCapacity NS_SWIFT_NAME(init(mmapID:cryptKey:rootPath:expectedCapacity:));
+
 
 /// you can call this on applicationWillTerminate, it's totally fine if you don't call
 + (void)onAppTerminate;
@@ -172,43 +195,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)getBoolForKey:(NSString *)key __attribute__((swift_name("bool(forKey:)")));
 - (BOOL)getBoolForKey:(NSString *)key defaultValue:(BOOL)defaultValue __attribute__((swift_name("bool(forKey:defaultValue:)")));
-- (BOOL)getBoolForKey:(NSString *)key defaultValue:(BOOL)defaultValue hasValue:(OUT nullable BOOL *)hasValue __attribute__((swift_name("bool(forKey:defaultValue:hasValue:)")));
+- (BOOL)getBoolForKey:(NSString *)key defaultValue:(BOOL)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue __attribute__((swift_name("bool(forKey:defaultValue:hasValue:)")));
 
 - (int32_t)getInt32ForKey:(NSString *)key NS_SWIFT_NAME(int32(forKey:));
 - (int32_t)getInt32ForKey:(NSString *)key defaultValue:(int32_t)defaultValue NS_SWIFT_NAME(int32(forKey:defaultValue:));
-- (int32_t)getInt32ForKey:(NSString *)key defaultValue:(int32_t)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(int32(forKey:defaultValue:hasValue:));
+- (int32_t)getInt32ForKey:(NSString *)key defaultValue:(int32_t)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(int32(forKey:defaultValue:hasValue:));
 
 - (uint32_t)getUInt32ForKey:(NSString *)key NS_SWIFT_NAME(uint32(forKey:));
 - (uint32_t)getUInt32ForKey:(NSString *)key defaultValue:(uint32_t)defaultValue NS_SWIFT_NAME(uint32(forKey:defaultValue:));
-- (uint32_t)getUInt32ForKey:(NSString *)key defaultValue:(uint32_t)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(uint32(forKey:defaultValue:hasValue:));
+- (uint32_t)getUInt32ForKey:(NSString *)key defaultValue:(uint32_t)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(uint32(forKey:defaultValue:hasValue:));
 
 - (int64_t)getInt64ForKey:(NSString *)key NS_SWIFT_NAME(int64(forKey:));
 - (int64_t)getInt64ForKey:(NSString *)key defaultValue:(int64_t)defaultValue NS_SWIFT_NAME(int64(forKey:defaultValue:));
-- (int64_t)getInt64ForKey:(NSString *)key defaultValue:(int64_t)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(int64(forKey:defaultValue:hasValue:));
+- (int64_t)getInt64ForKey:(NSString *)key defaultValue:(int64_t)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(int64(forKey:defaultValue:hasValue:));
 
 - (uint64_t)getUInt64ForKey:(NSString *)key NS_SWIFT_NAME(uint64(forKey:));
 - (uint64_t)getUInt64ForKey:(NSString *)key defaultValue:(uint64_t)defaultValue NS_SWIFT_NAME(uint64(forKey:defaultValue:));
-- (uint64_t)getUInt64ForKey:(NSString *)key defaultValue:(uint64_t)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(uint64(forKey:defaultValue:hasValue:));
+- (uint64_t)getUInt64ForKey:(NSString *)key defaultValue:(uint64_t)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(uint64(forKey:defaultValue:hasValue:));
 
 - (float)getFloatForKey:(NSString *)key NS_SWIFT_NAME(float(forKey:));
 - (float)getFloatForKey:(NSString *)key defaultValue:(float)defaultValue NS_SWIFT_NAME(float(forKey:defaultValue:));
-- (float)getFloatForKey:(NSString *)key defaultValue:(float)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(float(forKey:defaultValue:hasValue:));
+- (float)getFloatForKey:(NSString *)key defaultValue:(float)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(float(forKey:defaultValue:hasValue:));
 
 - (double)getDoubleForKey:(NSString *)key NS_SWIFT_NAME(double(forKey:));
 - (double)getDoubleForKey:(NSString *)key defaultValue:(double)defaultValue NS_SWIFT_NAME(double(forKey:defaultValue:));
-- (double)getDoubleForKey:(NSString *)key defaultValue:(double)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(double(forKey:defaultValue:hasValue:));
+- (double)getDoubleForKey:(NSString *)key defaultValue:(double)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(double(forKey:defaultValue:hasValue:));
 
 - (nullable NSString *)getStringForKey:(NSString *)key NS_SWIFT_NAME(string(forKey:));
 - (nullable NSString *)getStringForKey:(NSString *)key defaultValue:(nullable NSString *)defaultValue NS_SWIFT_NAME(string(forKey:defaultValue:));
-- (nullable NSString *)getStringForKey:(NSString *)key defaultValue:(nullable NSString *)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(string(forKey:defaultValue:hasValue:));
+- (nullable NSString *)getStringForKey:(NSString *)key defaultValue:(nullable NSString *)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(string(forKey:defaultValue:hasValue:));
 
 - (nullable NSDate *)getDateForKey:(NSString *)key NS_SWIFT_NAME(date(forKey:));
 - (nullable NSDate *)getDateForKey:(NSString *)key defaultValue:(nullable NSDate *)defaultValue NS_SWIFT_NAME(date(forKey:defaultValue:));
-- (nullable NSDate *)getDateForKey:(NSString *)key defaultValue:(nullable NSDate *)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(date(forKey:defaultValue:hasValue:));
+- (nullable NSDate *)getDateForKey:(NSString *)key defaultValue:(nullable NSDate *)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(date(forKey:defaultValue:hasValue:));
 
 - (nullable NSData *)getDataForKey:(NSString *)key NS_SWIFT_NAME(data(forKey:));
 - (nullable NSData *)getDataForKey:(NSString *)key defaultValue:(nullable NSData *)defaultValue NS_SWIFT_NAME(data(forKey:defaultValue:));
-- (nullable NSData *)getDataForKey:(NSString *)key defaultValue:(nullable NSData *)defaultValue hasValue:(OUT nullable BOOL *)hasValue NS_SWIFT_NAME(data(forKey:defaultValue:hasValue:));
+- (nullable NSData *)getDataForKey:(NSString *)key defaultValue:(nullable NSData *)defaultValue hasValue:(MMKV_OUT nullable BOOL *)hasValue NS_SWIFT_NAME(data(forKey:defaultValue:hasValue:));
 
 // return the actual size consumption of the key's value
 // Note: might be a little bigger than value's length
@@ -233,15 +256,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enumerateKeys:(void (^)(NSString *key, BOOL *stop))block;
 - (NSArray *)allKeys;
 
+/// return count of non-expired keys, keep in mind that it comes with cost
+- (size_t)countNonExpiredKeys;
+
+/// return all non-expired keys, keep in mind that it comes with cost
+- (NSArray *)allNonExpiredKeys;
+
 /// all keys created (or last modified) longger than expiredInSeconds will be deleted on next full-write-back
+/// enableCompareBeforeSet will be invalid when Expiration is on
 /// @param expiredInSeconds = MMKVExpireNever (0) means no common expiration duration for all keys, aka each key will have it's own expiration duration
 - (BOOL)enableAutoKeyExpire:(uint32_t) expiredInSeconds NS_SWIFT_NAME(enableAutoKeyExpire(expiredInSeconds:));
 
 - (BOOL)disableAutoKeyExpire;
 
+/// Enable data compare before set, for better performance
+/// If data for key seldom changes, use it
+/// Notice: When encryption or expiration is on, compare-before-set will be invalid.
+/// For encryption, compare operation must decrypt data which is time consuming
+/// For expiration, compare is useless because in most cases the expiration time changes every time.
+- (BOOL)enableCompareBeforeSet;
+
+- (BOOL)disableCompareBeforeSet;
+
 - (void)removeValueForKey:(NSString *)key NS_SWIFT_NAME(removeValue(forKey:));
 
 - (void)removeValuesForKeys:(NSArray<NSString *> *)arrKeys NS_SWIFT_NAME(removeValues(forKeys:));
+
+- (void)clearAllWithKeepingSpace;
 
 - (void)clearAll;
 
@@ -325,14 +366,21 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setLogLevel:(MMKVLogLevel)logLevel __attribute__((deprecated("use +initializeMMKV:logLevel: instead", "initializeMMKV:nil logLevel")));
 
 /// Migrate NSUserDefault data to MMKV
-/// @param userDaults the NSUserDefaults instance to be imported
+/// @param userDaults the dictionaryRepresentation of the NSUserDefaults instance to be imported
 /// @return imported count of key-values
-- (uint32_t)migrateFromUserDefaults:(NSUserDefaults *)userDaults NS_SWIFT_NAME(migrateFrom(userDefaults:));
+- (uint64_t)migrateFromUserDefaultsDictionaryRepresentation:(NSDictionary *)userDaults NS_SWIFT_NAME(migrateFrom(userDefaultsDictionaryRepresentation:));
+// use [MMKV migrateFromUserDefaultsDictionaryRepresentation:] instead
+- (uint32_t)migrateFromUserDefaults:(id) userDaults NS_SWIFT_NAME(migrateFrom(userDefaults:)) NS_UNAVAILABLE;
 
 /// detect if the MMKV file is valid or not
 /// Note: Don't use this to check the existence of the instance, the return value is undefined if the file was never created.
 + (BOOL)isFileValid:(NSString *)mmapID NS_SWIFT_NAME(isFileValid(for:));
 + (BOOL)isFileValid:(NSString *)mmapID rootPath:(nullable NSString *)path NS_SWIFT_NAME(isFileValid(for:rootPath:));
+
+/// remove the storage of the MMKV, including the data file & meta file (.crc)
+/// Note: the existing instance (if any) will be closed & destroyed
++ (BOOL)removeStorage:(NSString *)mmapID rootPath:(nullable NSString *)path NS_SWIFT_NAME(removeStorage(for:rootPath:));
++ (BOOL)removeStorage:(NSString *)mmapID mode:(MMKVMode)mode NS_SWIFT_NAME(removeStorage(for:mode:));
 
 NS_ASSUME_NONNULL_END
 

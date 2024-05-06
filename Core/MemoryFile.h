@@ -23,6 +23,7 @@
 #ifdef __cplusplus
 
 #include "MMKVPredef.h"
+#include <cstdint>
 #include <functional>
 
 #ifdef MMKV_ANDROID
@@ -53,6 +54,11 @@ static inline OpenFlag operator | (OpenFlag left, OpenFlag right) {
 
 static inline bool operator & (OpenFlag left, OpenFlag right) {
     return ((static_cast<uint32_t>(left) & static_cast<uint32_t>(right)) != 0);
+}
+
+template <typename T>
+T roundUp(T numToRound, T multiple) {
+    return ((numToRound + multiple - 1) / multiple) * multiple;
 }
 
 class File {
@@ -110,9 +116,9 @@ class MemoryFile {
 
 public:
 #ifndef MMKV_ANDROID
-    explicit MemoryFile(MMKVPath_t path);
+    explicit MemoryFile(MMKVPath_t path, size_t expectedCapacity = 0);
 #else
-    MemoryFile(MMKVPath_t path, size_t size, FileType fileType);
+    MemoryFile(MMKVPath_t path, size_t size, FileType fileType, size_t expectedCapacity = 0);
     explicit MemoryFile(MMKVFileHandle_t ashmemFD);
 
     const FileType m_fileType;
@@ -137,7 +143,7 @@ public:
     bool msync(SyncFlag syncFlag);
 
     // call this if clearMemoryCache() has been called
-    void reloadFromFile();
+    void reloadFromFile(size_t expectedCapacity = 0);
 
     void clearMemoryCache() { doCleanMemoryCache(false); }
 

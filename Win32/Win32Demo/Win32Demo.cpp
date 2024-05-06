@@ -41,7 +41,7 @@ wstring getAppDataRoaming(const wstring &company, const wstring &appName) {
     }
 }
 
-string to_string(vector<string> &&arr, const char *sp = ", ") {
+string to_string(const vector<string> &arr, const char *sp = ", ") {
     string str;
     for (const auto &element : arr) {
         str += element;
@@ -313,6 +313,58 @@ void testAutoExpire() {
     Sleep(2 * 1000);
     assert(mmkv->containsKey("never_expire_key_1") == true);
     assert(mmkv->containsKey("auto_expire_key_1") == false);
+
+    auto count = mmkv->count(true);
+    cout << "count all non expire keys: " << count << endl;
+    auto allKeys = mmkv->allKeys(true);
+    cout << "all non expire keys: " << ::to_string(allKeys) << endl;
+}
+
+void testExpectedCapacity() {
+    int len = 10000;
+    std::string value(len, '0');
+    value = "¿¿?¿¿¿_" + value;
+    cout << "value length = " << value.size() << endl;
+    std::string key = "key";
+    // if you know exactly the sizes of key and value, set expectedCapacity for performance improvement
+    size_t expectedSize = key.size() + value.size();
+    auto mmkv4 = MMKV::mmkvWithID("testExpectedCapacity4", MMKV_SINGLE_PROCESS, nullptr, nullptr, expectedSize);
+    // 0 times expand
+    mmkv4->set(value, key);
+
+    int count = 10;
+    expectedSize = (key.size() + value.size()) * count;
+    auto mmkv5 = MMKV::mmkvWithID("testExpectedCapacity5", MMKV_SINGLE_PROCESS, nullptr, nullptr, expectedSize);
+    for (int i = 0; i < count; i++) {
+        key[0] = static_cast<char>('a' + i);
+        // 0 times expand
+        mmkv5->set(value, key);
+    }
+}
+
+void testRemoveStorage() {
+    string mmapID = "test_remove";
+    {
+        auto mmkv = MMKV::mmkvWithID(mmapID, MMKV_MULTI_PROCESS);
+        mmkv->set(true, "bool");
+    }
+    MMKV::removeStorage(mmapID);
+    {
+        auto mmkv = MMKV::mmkvWithID(mmapID, MMKV_MULTI_PROCESS);
+        if (mmkv->count() != 0) {
+            abort();
+        }
+    }
+
+    mmapID = "test_remove/sg";
+    auto rootDir = MMKV::getRootDir() + L"_1";
+    auto mmkv = MMKV::mmkvWithID(mmapID, MMKV_SINGLE_PROCESS, nullptr, &rootDir);
+    mmkv->set(true, "bool");
+    MMKV::removeStorage(mmapID, &rootDir);
+    mmkv = MMKV::mmkvWithID(mmapID, MMKV_SINGLE_PROCESS, nullptr, &rootDir);
+    if (mmkv->count() != 0) {
+        abort();
+    }
 }
 
 static void
@@ -363,4 +415,6 @@ int main() {
     testBackup();
     testRestore();
     testAutoExpire();
+    testExpectedCapacity();
+    testRemoveStorage();
 }

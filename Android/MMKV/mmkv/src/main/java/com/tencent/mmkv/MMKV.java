@@ -32,6 +32,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import org.jetbrains.annotations.Contract;
+
+import dalvik.annotation.optimization.FastNative;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -63,8 +68,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
         logLevel2Index.put(MMKVLogLevel.LevelError, 3);
         logLevel2Index.put(MMKVLogLevel.LevelNone, 4);
 
-        index2LogLevel = new MMKVLogLevel[] {MMKVLogLevel.LevelDebug, MMKVLogLevel.LevelInfo, MMKVLogLevel.LevelWarning,
-                                             MMKVLogLevel.LevelError, MMKVLogLevel.LevelNone};
+        index2LogLevel = new MMKVLogLevel[]{MMKVLogLevel.LevelDebug, MMKVLogLevel.LevelInfo, MMKVLogLevel.LevelWarning,
+                MMKVLogLevel.LevelError, MMKVLogLevel.LevelNone};
 
         checkedHandleSet = new HashSet<Long>();
     }
@@ -72,15 +77,18 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * The interface for providing a 3rd library loader (the ReLinker https://github.com/KeepSafe/ReLinker, etc).
      */
-    public interface LibLoader { void loadLibrary(String libName); }
+    public interface LibLoader {
+        void loadLibrary(String libName);
+    }
 
     /**
      * Initialize MMKV with default configuration.
      * You must call one of the initialize() methods on App startup process before using MMKV.
+     *
      * @param context The context of Android App, usually from Application.
      * @return The root folder of MMKV, defaults to $(FilesDir)/mmkv.
      */
-    public static String initialize(Context context) {
+    public static String initialize(@NonNull Context context) {
         String root = context.getFilesDir().getAbsolutePath() + "/mmkv";
         MMKVLogLevel logLevel = BuildConfig.DEBUG ? MMKVLogLevel.LevelDebug : MMKVLogLevel.LevelInfo;
         return initialize(context, root, null, logLevel, null);
@@ -89,11 +97,12 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with customize log level.
      * You must call one of the initialize() methods on App startup process before using MMKV.
-     * @param context The context of Android App, usually from Application.
+     *
+     * @param context  The context of Android App, usually from Application.
      * @param logLevel The log level of MMKV, defaults to {@link MMKVLogLevel#LevelInfo}.
      * @return The root folder of MMKV, defaults to $(FilesDir)/mmkv.
      */
-    public static String initialize(Context context, MMKVLogLevel logLevel) {
+    public static String initialize(@NonNull Context context, MMKVLogLevel logLevel) {
         String root = context.getFilesDir().getAbsolutePath() + "/mmkv";
         return initialize(context, root, null, logLevel, null);
     }
@@ -101,11 +110,12 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with a 3rd library loader.
      * You must call one of the initialize() methods on App startup process before using MMKV.
+     *
      * @param context The context of Android App, usually from Application.
-     * @param loader The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
+     * @param loader  The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
      * @return The root folder of MMKV, defaults to $(FilesDir)/mmkv.
      */
-    public static String initialize(Context context, LibLoader loader) {
+    public static String initialize(@NonNull Context context, LibLoader loader) {
         String root = context.getFilesDir().getAbsolutePath() + "/mmkv";
         MMKVLogLevel logLevel = BuildConfig.DEBUG ? MMKVLogLevel.LevelDebug : MMKVLogLevel.LevelInfo;
         return initialize(context, root, loader, logLevel, null);
@@ -114,12 +124,13 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with a 3rd library loader, and customize log level.
      * You must call one of the initialize() methods on App startup process before using MMKV.
-     * @param context The context of Android App, usually from Application.
-     * @param loader The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
+     *
+     * @param context  The context of Android App, usually from Application.
+     * @param loader   The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
      * @param logLevel The log level of MMKV, defaults to {@link MMKVLogLevel#LevelInfo}.
      * @return The root folder of MMKV, defaults to $(FilesDir)/mmkv.
      */
-    public static String initialize(Context context, LibLoader loader, MMKVLogLevel logLevel) {
+    public static String initialize(@NonNull Context context, LibLoader loader, MMKVLogLevel logLevel) {
         String root = context.getFilesDir().getAbsolutePath() + "/mmkv";
         return initialize(context, root, loader, logLevel, null);
     }
@@ -127,6 +138,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with customize root folder.
      * You must call one of the initialize() methods on App startup process before using MMKV.
+     *
      * @param context The context of Android App, usually from Application.
      * @param rootDir The root folder of MMKV, defaults to $(FilesDir)/mmkv.
      * @return The root folder of MMKV.
@@ -139,8 +151,9 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with customize root folder, and log level.
      * You must call one of the initialize() methods on App startup process before using MMKV.
-     * @param context The context of Android App, usually from Application.
-     * @param rootDir The root folder of MMKV, defaults to $(FilesDir)/mmkv.
+     *
+     * @param context  The context of Android App, usually from Application.
+     * @param rootDir  The root folder of MMKV, defaults to $(FilesDir)/mmkv.
      * @param logLevel The log level of MMKV, defaults to {@link MMKVLogLevel#LevelInfo}.
      * @return The root folder of MMKV.
      */
@@ -151,9 +164,10 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with customize root folder, and a 3rd library loader.
      * You must call one of the initialize() methods on App startup process before using MMKV.
+     *
      * @param context The context of Android App, usually from Application.
      * @param rootDir The root folder of MMKV, defaults to $(FilesDir)/mmkv.
-     * @param loader The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
+     * @param loader  The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
      * @return The root folder of MMKV.
      */
     public static String initialize(Context context, String rootDir, LibLoader loader) {
@@ -164,9 +178,10 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Initialize MMKV with customize settings.
      * You must call one of the initialize() methods on App startup process before using MMKV.
-     * @param context The context of Android App, usually from Application.
-     * @param rootDir The root folder of MMKV, defaults to $(FilesDir)/mmkv.
-     * @param loader The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
+     *
+     * @param context  The context of Android App, usually from Application.
+     * @param rootDir  The root folder of MMKV, defaults to $(FilesDir)/mmkv.
+     * @param loader   The 3rd library loader (for example, the <a href="https://github.com/KeepSafe/ReLinker">ReLinker</a> .
      * @param logLevel The log level of MMKV, defaults to {@link MMKVLogLevel#LevelInfo}.
      * @return The root folder of MMKV.
      */
@@ -174,7 +189,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
         return initialize(context, rootDir, loader, logLevel, null);
     }
 
-    public static String initialize(Context context, String rootDir, LibLoader loader, MMKVLogLevel logLevel, MMKVHandler handler) {
+    public static String initialize(@NonNull Context context, String rootDir, LibLoader loader, MMKVLogLevel logLevel, MMKVHandler handler) {
         // disable process mode in release build
         // FIXME: Find a better way to getApplicationInfo() without using context.
         //  If any one knows how, you're welcome to make a contribution.
@@ -262,7 +277,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
         return rootDir;
     }
 
-    private static int logLevel2Int(MMKVLogLevel level) {
+    @Contract(pure = true)
+    private static int logLevel2Int(@NonNull MMKVLogLevel level) {
         int realLevel;
         switch (level) {
             case LevelDebug:
@@ -287,6 +303,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Set the log level of MMKV.
+     *
      * @param level Defaults to {@link MMKVLogLevel#LevelInfo}.
      */
     public static void setLogLevel(MMKVLogLevel level) {
@@ -319,90 +336,159 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Create an MMKV instance with an unique ID (in single-process mode).
+     *
      * @param mmapID The unique ID of the MMKV instance.
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV mmkvWithID(String mmapID) throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
         }
 
-        long handle = getMMKVWithID(mmapID, SINGLE_PROCESS_MODE, null, null);
+        long handle = getMMKVWithID(mmapID, SINGLE_PROCESS_MODE, null, null, 0);
         return checkProcessMode(handle, mmapID, SINGLE_PROCESS_MODE);
     }
 
     /**
      * Create an MMKV instance in single-process or multi-process mode.
+     *
      * @param mmapID The unique ID of the MMKV instance.
-     * @param mode The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     * @param mode   The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV mmkvWithID(String mmapID, int mode) throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
         }
 
-        long handle = getMMKVWithID(mmapID, mode, null, null);
+        long handle = getMMKVWithID(mmapID, mode, null, null, 0);
+        return checkProcessMode(handle, mmapID, mode);
+    }
+
+    /**
+     * Create an MMKV instance in single-process or multi-process mode.
+     *
+     * @param mmapID The unique ID of the MMKV instance.
+     * @param mode   The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     * @param expectedCapacity The file size you expected when opening or creating file
+     * @throws RuntimeException if there's an runtime error.
+     */
+    @NonNull
+    public static MMKV mmkvWithID(String mmapID, int mode, long expectedCapacity) throws RuntimeException {
+        if (rootDir == null) {
+            throw new IllegalStateException("You should Call MMKV.initialize() first.");
+        }
+
+        long handle = getMMKVWithID(mmapID, mode, null, null, expectedCapacity);
         return checkProcessMode(handle, mmapID, mode);
     }
 
     /**
      * Create an MMKV instance in customize process mode, with an encryption key.
-     * @param mmapID The unique ID of the MMKV instance.
-     * @param mode The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param mode     The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
      * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV mmkvWithID(String mmapID, int mode, @Nullable String cryptKey) throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
         }
 
-        long handle = getMMKVWithID(mmapID, mode, cryptKey, null);
+        long handle = getMMKVWithID(mmapID, mode, cryptKey, null, 0);
         return checkProcessMode(handle, mmapID, mode);
     }
 
     /**
      * Create an MMKV instance in customize folder.
-     * @param mmapID The unique ID of the MMKV instance.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
      * @param rootPath The folder of the MMKV instance, defaults to $(FilesDir)/mmkv.
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV mmkvWithID(String mmapID, String rootPath) throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
         }
 
-        long handle = getMMKVWithID(mmapID, SINGLE_PROCESS_MODE, null, rootPath);
+        long handle = getMMKVWithID(mmapID, SINGLE_PROCESS_MODE, null, rootPath, 0);
+        return checkProcessMode(handle, mmapID, SINGLE_PROCESS_MODE);
+    }
+
+    /**
+     * Create an MMKV instance in customize folder.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param rootPath The folder of the MMKV instance, defaults to $(FilesDir)/mmkv.
+     * @param expectedCapacity The file size you expected when opening or creating file
+     * @throws RuntimeException if there's an runtime error.
+     */
+    @NonNull
+    public static MMKV mmkvWithID(String mmapID, String rootPath, long expectedCapacity) throws RuntimeException {
+        if (rootDir == null) {
+            throw new IllegalStateException("You should Call MMKV.initialize() first.");
+        }
+
+        long handle = getMMKVWithID(mmapID, SINGLE_PROCESS_MODE, null, rootPath, expectedCapacity);
         return checkProcessMode(handle, mmapID, SINGLE_PROCESS_MODE);
     }
 
     /**
      * Create an MMKV instance with customize settings all in one.
-     * @param mmapID The unique ID of the MMKV instance.
-     * @param mode The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param mode     The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
      * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
      * @param rootPath The folder of the MMKV instance, defaults to $(FilesDir)/mmkv.
+     * @param expectedCapacity The file size you expected when opening or creating file
      * @throws RuntimeException if there's an runtime error.
      */
-    public static MMKV mmkvWithID(String mmapID, int mode, @Nullable String cryptKey, String rootPath)
-        throws RuntimeException {
+    @NonNull
+    public static MMKV mmkvWithID(String mmapID, int mode, @Nullable String cryptKey, String rootPath, long expectedCapacity)
+            throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
         }
 
-        long handle = getMMKVWithID(mmapID, mode, cryptKey, rootPath);
+        long handle = getMMKVWithID(mmapID, mode, cryptKey, rootPath, expectedCapacity);
+        return checkProcessMode(handle, mmapID, mode);
+    }
+
+    /**
+     * Create an MMKV instance with customize settings all in one.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param mode     The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
+     * @param rootPath The folder of the MMKV instance, defaults to $(FilesDir)/mmkv.
+     * @throws RuntimeException if there's an runtime error.
+     */
+    @NonNull
+    public static MMKV mmkvWithID(String mmapID, int mode, @Nullable String cryptKey, String rootPath)
+            throws RuntimeException {
+        if (rootDir == null) {
+            throw new IllegalStateException("You should Call MMKV.initialize() first.");
+        }
+
+        long handle = getMMKVWithID(mmapID, mode, cryptKey, rootPath, 0);
         return checkProcessMode(handle, mmapID, mode);
     }
 
     /**
      * Get an backed-up MMKV instance with customize settings all in one.
-     * @param mmapID The unique ID of the MMKV instance.
-     * @param mode The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param mode     The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
      * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
      * @param rootPath The backup folder of the MMKV instance.
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV backedUpMMKVWithID(String mmapID, int mode, @Nullable String cryptKey, String rootPath)
             throws RuntimeException {
         if (rootDir == null) {
@@ -410,22 +496,24 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
         }
 
         mode |= BACKUP_MODE;
-        long handle = getMMKVWithID(mmapID, mode, cryptKey, rootPath);
+        long handle = getMMKVWithID(mmapID, mode, cryptKey, rootPath, 0);
         return checkProcessMode(handle, mmapID, mode);
     }
 
     /**
      * Create an MMKV instance base on Anonymous Shared Memory, aka not synced to any disk files.
-     * @param context The context of Android App, usually from Application.
-     * @param mmapID The unique ID of the MMKV instance.
-     * @param size The maximum size of the underlying Anonymous Shared Memory.
-     *            Anonymous Shared Memory on Android can't grow dynamically, must set an appropriate size on creation.
-     * @param mode The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     *
+     * @param context  The context of Android App, usually from Application.
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param size     The maximum size of the underlying Anonymous Shared Memory.
+     *                 Anonymous Shared Memory on Android can't grow dynamically, must set an appropriate size on creation.
+     * @param mode     The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
      * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV mmkvWithAshmemID(Context context, String mmapID, int size, int mode, @Nullable String cryptKey)
-        throws RuntimeException {
+            throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
         }
@@ -460,7 +548,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
                     MMKV mmkv = parcelableMMKV.toMMKV();
                     if (mmkv != null) {
                         simpleLog(MMKVLogLevel.LevelInfo,
-                                  mmkv.mmapID() + " fd = " + mmkv.ashmemFD() + ", meta fd = " + mmkv.ashmemMetaFD());
+                                mmkv.mmapID() + " fd = " + mmkv.ashmemFD() + ", meta fd = " + mmkv.ashmemMetaFD());
                         return mmkv;
                     }
                 }
@@ -478,8 +566,10 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Create the default MMKV instance in single-process mode.
+     *
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV defaultMMKV() throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
@@ -491,10 +581,12 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Create the default MMKV instance in customize process mode, with an encryption key.
-     * @param mode The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
+     *
+     * @param mode     The process mode of the MMKV instance, defaults to {@link #SINGLE_PROCESS_MODE}.
      * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
      * @throws RuntimeException if there's an runtime error.
      */
+    @NonNull
     public static MMKV defaultMMKV(int mode, @Nullable String cryptKey) throws RuntimeException {
         if (rootDir == null) {
             throw new IllegalStateException("You should Call MMKV.initialize() first.");
@@ -504,6 +596,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
         return checkProcessMode(handle, "DefaultMMKV", mode);
     }
 
+    @NonNull
+    @Contract("_, _, _ -> new")
     private static MMKV checkProcessMode(long handle, String mmapID, int mode) throws RuntimeException {
         if (handle == 0) {
             throw new RuntimeException("Fail to create an MMKV instance [" + mmapID + "] in JNI");
@@ -565,6 +659,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Transform plain text into encrypted text, or vice versa by passing a null encryption key.
      * You can also change existing crypt key with a different cryptKey.
+     *
      * @param cryptKey The new encryption key (no more than 16 bytes).
      * @return True if success, otherwise False.
      */
@@ -573,6 +668,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Just reset the encryption key (will not encrypt or decrypt anything).
      * Usually you should call this method after another process has {@link #reKey(String)} the multi-process MMKV instance.
+     *
      * @param cryptKey The new encryption key (no more than 16 bytes).
      */
     public native void checkReSetCryptKey(@Nullable String cryptKey);
@@ -609,6 +705,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
      * Try exclusively inter-process lock the MMKV instance.
      * It will not block if the file has already been locked by another process.
      * It will make no effect if the MMKV instance is created with {@link #SINGLE_PROCESS_MODE}.
+     *
      * @return True if successfully locked, otherwise return immediately with False.
      */
     public native boolean tryLock();
@@ -618,7 +715,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, boolean value, int expireDurationInSecond) {
@@ -638,7 +736,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, int value, int expireDurationInSecond) {
@@ -658,7 +757,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, long value, int expireDurationInSecond) {
@@ -678,7 +778,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, float value, int expireDurationInSecond) {
@@ -698,7 +799,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, double value, int expireDurationInSecond) {
@@ -718,7 +820,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, @Nullable String value, int expireDurationInSecond) {
@@ -740,7 +843,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, @Nullable Set<String> value, int expireDurationInSecond) {
@@ -781,7 +885,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, @Nullable byte[] value, int expireDurationInSecond) {
@@ -818,7 +923,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     }
 
     /**
-     * Set value with customize expiration in sections.
+     * Set value with customize expiration in seconds.
+     *
      * @param expireDurationInSecond override the default duration, {@link #ExpireNever} (0) means never expire.
      */
     public boolean encode(String key, @Nullable Parcelable value, int expireDurationInSecond) {
@@ -868,8 +974,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
                 return creator.createFromParcel(source);
             } else {
                 throw new Exception("Parcelable protocol requires a "
-                                    + "non-null static Parcelable.Creator object called "
-                                    + "CREATOR on class " + name);
+                        + "non-null static Parcelable.Creator object called "
+                        + "CREATOR on class " + name);
             }
         } catch (Exception e) {
             simpleLog(MMKVLogLevel.LevelError, e.toString());
@@ -882,6 +988,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Get the actual size consumption of the key's value.
      * Note: might be a little bigger than value's length.
+     *
      * @param key The key of the value.
      */
     public int getValueSize(String key) {
@@ -890,6 +997,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Get the actual size of the key's value. String's length or byte[]'s length, etc.
+     *
      * @param key The key of the value.
      */
     public int getValueActualSize(String key) {
@@ -898,6 +1006,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Check whether or not MMKV contains the key.
+     *
      * @param key The key of the value.
      */
     public boolean containsKey(String key) {
@@ -908,13 +1017,30 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
      * @return All the keys.
      */
     @Nullable
-    public native String[] allKeys();
+    public String[] allKeys() {
+        return allKeys(nativeHandle, false);
+    }
+
+    /**
+     * @return All non-expired keys. Note that this call has costs.
+     */
+    @Nullable
+    public String[] allNonExpireKeys() {
+        return allKeys(nativeHandle, true);
+    }
 
     /**
      * @return The total count of all the keys.
      */
     public long count() {
-        return count(nativeHandle);
+        return count(nativeHandle, false);
+    }
+
+    /**
+     * @return The total count of all non-expired keys. Note that this call has costs.
+     */
+    public long countNonExpiredKeys() {
+        return count(nativeHandle, true);
     }
 
     /**
@@ -938,14 +1064,23 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Batch remove some keys from the MMKV instance.
+     *
      * @param arrKeys The keys to be removed.
      */
     public native void removeValuesForKeys(String[] arrKeys);
 
     /**
      * Clear all the key-values inside the MMKV instance.
+     * The data file will be trimmed down to `pageSize`, and some sync operations will be called
+     * If you do not want to trim the file, use {@link #clearAllWithKeepingSpace()} instead for better performance
      */
     public native void clearAll();
+
+    /**
+     * Faster {@link #clearAll()} implementation
+     * The file size is kept as previous for later use
+     */
+    public native void clearAllWithKeepingSpace();
 
     /**
      * The {@link #totalSize()} of an MMKV instance won't reduce after deleting key-values,
@@ -996,18 +1131,39 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Check whether the MMKV file is valid or not on customize folder.
-     * @param mmapID The unique ID of the MMKV instance.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
      * @param rootPath The folder of the MMKV instance, defaults to $(FilesDir)/mmkv.
      */
     public static native boolean isFileValid(String mmapID, @Nullable String rootPath);
 
     /**
+     * remove the storage of the MMKV, including the data file & meta file (.crc)
+     * Note: the existing instance (if any) will be closed & destroyed
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     */
+    public static boolean removeStorage(String mmapID) {
+        return removeStorage(mmapID, null);
+    }
+
+    /**
+     * remove the storage of the MMKV, including the data file & meta file (.crc)
+     * Note: the existing instance (if any) will be closed & destroyed
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param rootPath The folder of the MMKV instance, defaults to $(FilesDir)/mmkv.
+     */
+    public static native boolean removeStorage(String mmapID, @Nullable String rootPath);
+
+    /**
      * Atomically migrate all key-values from an existent SharedPreferences to the MMKV instance.
+     *
      * @param preferences The SharedPreferences to import from.
      * @return The total count of key-values imported.
      */
     @SuppressWarnings("unchecked")
-    public int importFromSharedPreferences(SharedPreferences preferences) {
+    public int importFromSharedPreferences(@NonNull SharedPreferences preferences) {
         Map<String, ?> kvs = preferences.getAll();
         if (kvs == null || kvs.size() <= 0) {
             return 0;
@@ -1043,22 +1199,25 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * backup one MMKV instance to dstDir
-     * @param mmapID the MMKV ID to backup
+     *
+     * @param mmapID   the MMKV ID to backup
      * @param rootPath the customize root path of the MMKV, if null then backup from the root dir of MMKV
-     * @param dstDir the backup destination directory
+     * @param dstDir   the backup destination directory
      */
     public static native boolean backupOneToDirectory(String mmapID, String dstDir, @Nullable String rootPath);
 
     /**
      * restore one MMKV instance from srcDir
-     * @param mmapID the MMKV ID to restore
-     * @param srcDir the restore source directory
+     *
+     * @param mmapID   the MMKV ID to restore
+     * @param srcDir   the restore source directory
      * @param rootPath the customize root path of the MMKV, if null then restore to the root dir of MMKV
      */
     public static native boolean restoreOneMMKVFromDirectory(String mmapID, String srcDir, @Nullable String rootPath);
 
     /**
      * backup all MMKV instance to dstDir
+     *
      * @param dstDir the backup destination directory
      * @return count of MMKV successfully backuped
      */
@@ -1066,6 +1225,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * restore all MMKV instance from srcDir
+     *
      * @param srcDir the restore source directory
      * @return count of MMKV successfully restored
      */
@@ -1081,6 +1241,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Enable auto key expiration. This is a upgrade operation, the file format will change.
      * And the file won't be accessed correctly by older version (v1.2.16) of MMKV.
+     * NOTICE: enableCompareBeforeSet will be invalid when Expiration is on
      * @param expireDurationInSecond the expire duration for all keys, {@link #ExpireNever} (0) means no default duration (aka each key will have it's own expire date)
      */
     public native boolean enableAutoKeyExpire(int expireDurationInSecond);
@@ -1091,12 +1252,44 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     public native boolean disableAutoKeyExpire();
 
     /**
+     * Enable data compare before set, for better performance.
+     * If data for key seldom changes, use it.
+     * When encryption or expiration is on, compare-before-set will be invalid.
+     * For encryption, compare operation must decrypt data which is time consuming.
+     * For expiration, compare is useless because in most cases the expiration time changes every time.
+     */
+    public void enableCompareBeforeSet() {
+        if (isExpirationEnabled()) {
+            Log.e("MMKV", "enableCompareBeforeSet is invalid when Expiration is on");
+            if (BuildConfig.DEBUG) {
+                throw new RuntimeException("enableCompareBeforeSet is invalid when Expiration is on");
+            }
+        }
+        if (isEncryptionEnabled()) {
+            Log.e("MMKV", "enableCompareBeforeSet is invalid when key encryption is on");
+            if (BuildConfig.DEBUG) {
+                throw new RuntimeException("enableCompareBeforeSet is invalid when Expiration is on");
+            }
+        }
+        nativeEnableCompareBeforeSet();
+    }
+
+    @FastNative
+    private native void nativeEnableCompareBeforeSet();
+
+    /**
+     * Disable data compare before set
+     * disabled at default
+     */
+    public native void disableCompareBeforeSet();
+
+    /**
      * Intentionally Not Supported. Because MMKV does type-eraser inside to get better performance.
      */
     @Override
     public Map<String, ?> getAll() {
         throw new java.lang.UnsupportedOperationException(
-            "Intentionally Not Supported. Use allKeys() instead, getAll() not implement because type-erasure inside mmkv");
+                "Intentionally Not Supported. Use allKeys() instead, getAll() not implement because type-erasure inside mmkv");
     }
 
     @Nullable
@@ -1231,7 +1424,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
      * MMKV doesn't rely on commit() to save data to file.
      * If you really worry about losing battery and data corruption, call {@link #async()} or {@link #sync()} instead.
      */
-    @Override @Deprecated
+    @Override
+    @Deprecated
     public boolean commit() {
         sync(true);
         return true;
@@ -1242,7 +1436,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
      * MMKV doesn't rely on apply() to save data to file.
      * If you really worry about losing battery and data corruption, call {@link #async()} instead.
      */
-    @Override @Deprecated
+    @Override
+    @Deprecated
     public void apply() {
         sync(false);
     }
@@ -1277,13 +1472,16 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Get an ashmem MMKV instance that has been initiated by another process.
      * Normally you should just call {@link #mmkvWithAshmemID(Context, String, int, int, String)} instead.
-     * @param mmapID The unique ID of the MMKV instance.
-     * @param fd The file descriptor of the ashmem of the MMKV file, transferred from another process by binder.
-     * @param metaFD The file descriptor of the ashmem of the MMKV crc file, transferred from another process by binder.
+     *
+     * @param mmapID   The unique ID of the MMKV instance.
+     * @param fd       The file descriptor of the ashmem of the MMKV file, transferred from another process by binder.
+     * @param metaFD   The file descriptor of the ashmem of the MMKV crc file, transferred from another process by binder.
      * @param cryptKey The encryption key of the MMKV instance (no more than 16 bytes).
      * @throws RuntimeException If any failure in JNI or runtime.
      */
     // Parcelable
+    @NonNull
+    @Contract("_, _, _, _ -> new")
     public static MMKV mmkvWithAshmemFD(String mmapID, int fd, int metaFD, String cryptKey) throws RuntimeException {
         long handle = getMMKVWithAshmemFD(mmapID, fd, metaFD, cryptKey);
         if (handle == 0) {
@@ -1306,6 +1504,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
      * Create an native buffer, whose underlying memory can be directly transferred to another JNI method.
      * Avoiding unnecessary JNI boxing and unboxing.
      * An NativeBuffer must be manually {@link #destroyNativeBuffer} to avoid memory leak.
+     *
      * @param size The size of the underlying memory.
      */
     @Nullable
@@ -1320,15 +1519,16 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     /**
      * Destroy the native buffer. An NativeBuffer must be manually destroy to avoid memory leak.
      */
-    public static void destroyNativeBuffer(NativeBuffer buffer) {
+    public static void destroyNativeBuffer(@NonNull NativeBuffer buffer) {
         destroyNB(buffer.pointer, buffer.size);
     }
 
     /**
      * Write the value of the key to the native buffer.
+     *
      * @return The size written. Return -1 on any error.
      */
-    public int writeValueToNativeBuffer(String key, NativeBuffer buffer) {
+    public int writeValueToNativeBuffer(String key, @NonNull NativeBuffer buffer) {
         return writeValueToNB(nativeHandle, key, buffer.pointer, buffer.size);
     }
 
@@ -1338,6 +1538,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     /**
      * Register a handler for MMKV log redirecting, and error handling.
+     *
      * @deprecated This method is deprecated.
      * Use the {@link #initialize(Context, String, LibLoader, MMKVLogLevel, MMKVHandler)} method instead.
      */
@@ -1416,6 +1617,7 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
      * Register for MMKV inter-process content change notification.
      * The notification will trigger only when any method is manually called on the MMKV instance.
      * For example {@link #checkContentChangedByOuterProcess()}.
+     *
      * @param notify The notification handler.
      */
     public static void registerContentChangeNotify(MMKVContentChangeNotification notify) {
@@ -1454,7 +1656,8 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     private static native void jniInitialize(String rootDir, String cacheDir, int level, boolean wantLogReDirecting);
 
     private native static long
-    getMMKVWithID(String mmapID, int mode, @Nullable String cryptKey, @Nullable String rootPath);
+    getMMKVWithID(String mmapID, int mode, @Nullable String cryptKey, @Nullable String rootPath,
+                  long expectedCapacity);
 
     private native static long getMMKVWithIDAndSize(String mmapID, int size, int mode, @Nullable String cryptKey);
 
@@ -1463,43 +1666,51 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     private native static long getMMKVWithAshmemFD(String mmapID, int fd, int metaFD, @Nullable String cryptKey);
 
     private native boolean encodeBool(long handle, String key, boolean value);
+
     private native boolean encodeBool_2(long handle, String key, boolean value, int expireDurationInSecond);
 
     private native boolean decodeBool(long handle, String key, boolean defaultValue);
 
     private native boolean encodeInt(long handle, String key, int value);
+
     private native boolean encodeInt_2(long handle, String key, int value, int expireDurationInSecond);
 
     private native int decodeInt(long handle, String key, int defaultValue);
 
     private native boolean encodeLong(long handle, String key, long value);
+
     private native boolean encodeLong_2(long handle, String key, long value, int expireDurationInSecond);
 
     private native long decodeLong(long handle, String key, long defaultValue);
 
     private native boolean encodeFloat(long handle, String key, float value);
+
     private native boolean encodeFloat_2(long handle, String key, float value, int expireDurationInSecond);
 
     private native float decodeFloat(long handle, String key, float defaultValue);
 
     private native boolean encodeDouble(long handle, String key, double value);
+
     private native boolean encodeDouble_2(long handle, String key, double value, int expireDurationInSecond);
 
     private native double decodeDouble(long handle, String key, double defaultValue);
 
     private native boolean encodeString(long handle, String key, @Nullable String value);
+
     private native boolean encodeString_2(long handle, String key, @Nullable String value, int expireDurationInSecond);
 
     @Nullable
     private native String decodeString(long handle, String key, @Nullable String defaultValue);
 
     private native boolean encodeSet(long handle, String key, @Nullable String[] value);
+
     private native boolean encodeSet_2(long handle, String key, @Nullable String[] value, int expireDurationInSecond);
 
     @Nullable
     private native String[] decodeStringSet(long handle, String key);
 
     private native boolean encodeBytes(long handle, String key, @Nullable byte[] value);
+
     private native boolean encodeBytes_2(long handle, String key, @Nullable byte[] value, int expireDurationInSecond);
 
     @Nullable
@@ -1507,7 +1718,9 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
 
     private native boolean containsKey(long handle, String key);
 
-    private native long count(long handle);
+    private native String[] allKeys(long handle, boolean filterExpire);
+
+    private native long count(long handle, boolean filterExpire);
 
     private native long totalSize(long handle);
 
@@ -1526,6 +1739,14 @@ public class MMKV implements SharedPreferences, SharedPreferences.Editor {
     private static native void destroyNB(long pointer, int size);
 
     private native int writeValueToNB(long handle, String key, long pointer, int size);
+
+    private native boolean isCompareBeforeSetEnabled();
+
+    @FastNative
+    private native boolean isEncryptionEnabled();
+
+    @FastNative
+    private native boolean isExpirationEnabled();
 
     private static native boolean checkProcessMode(long handle);
 }

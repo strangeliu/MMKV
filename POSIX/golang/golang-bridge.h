@@ -42,7 +42,8 @@ typedef struct GoSliceWrap GoSliceWrap_t;
 void mmkvInitialize(GoStringWrap_t rootDir, int32_t logLevel, bool redirect);
 void onExit();
 
-void *getMMKVWithID(GoStringWrap_t mmapID, int32_t mode, GoStringWrap_t cryptKey, GoStringWrap_t rootPath);
+void *getMMKVWithID(GoStringWrap_t mmapID, int32_t mode, GoStringWrap_t cryptKey, 
+                    GoStringWrap_t rootPath, uint64_t expectedCapacity);
 void *getDefaultMMKV(int32_t mode, GoStringWrap_t cryptKey);
 const char *mmapID(void *handle);
 
@@ -82,15 +83,15 @@ bool reKey(void *handle, GoStringWrap_t oKey);
 void *cryptKey(void *handle, uint32_t *lengthPtr);
 void checkReSetCryptKey(void *handle, GoStringWrap_t oKey);
 
-GoStringWrap_t *allKeys(void *handle, uint64_t *lengthPtr);
+GoStringWrap_t *allKeys(void *handle, uint64_t *lengthPtr, bool filterExpire);
 bool containsKey(void *handle, GoStringWrap_t oKey);
-uint64_t count(void *handle);
+uint64_t count(void *handle, bool filterExpire);
 uint64_t totalSize(void *handle);
 uint64_t actualSize(void *handle);
 
 void removeValueForKey(void *handle, GoStringWrap_t oKey);
 void removeValuesForKeys(void *handle, GoStringWrap_t *keyArray, uint64_t count);
-void clearAll(void *handle);
+void clearAll(void *handle, bool keepSpace);
 
 void mmkvSync(void *handle, bool sync);
 void clearMemoryCache(void *handle);
@@ -104,6 +105,8 @@ uint64_t restoreAllFromDirectory(GoStringWrap_t srcDir, GoStringWrap_t dstDir);
 
 bool enableAutoExpire(void *handle, uint32_t expireDuration);
 bool disableAutoExpire(void *handle);
+bool enableCompareBeforeSet(void *handle);
+bool disableCompareBeforeSet(void *handle);
 
 int32_t pageSize();
 const char *version();
@@ -111,6 +114,8 @@ const char *version();
 void setWantsLogRedirect(bool redirect);
 void setWantsErrorHandle(bool errorHandle);
 void setWantsContentChangeHandle(bool contentChange);
+
+bool removeStorage(GoStringWrap_t mmapID, GoStringWrap_t rootPath);
 
 #ifdef __cplusplus
 }

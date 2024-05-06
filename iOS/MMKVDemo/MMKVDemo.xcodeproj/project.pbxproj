@@ -3,10 +3,16 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		702CE6842B7E85070015E8A4 /* MMKV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB36F25420F8A20C009AF46F /* MMKV.framework */; };
+		702CE6852B7E85070015E8A4 /* MMKV.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CB36F25420F8A20C009AF46F /* MMKV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		70A630972B7E7EC9003AB1DF /* MMKVVisionDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A630962B7E7EC9003AB1DF /* MMKVVisionDemoApp.swift */; };
+		70A630992B7E7EC9003AB1DF /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A630982B7E7EC9003AB1DF /* ContentView.swift */; };
+		70A6309B2B7E7ECA003AB1DF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 70A6309A2B7E7ECA003AB1DF /* Assets.xcassets */; };
+		70A6309E2B7E7ECA003AB1DF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 70A6309D2B7E7ECA003AB1DF /* Preview Assets.xcassets */; };
 		CB0DCC72242B57FC009AFE59 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = CBD5359823B4718200D3A404 /* libc++.tbd */; };
 		CB1E0659242B8E3F00F2FD42 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1FD4D12046AF2300931B5F /* libz.tbd */; };
 		CB1E065F242B8E4A00F2FD42 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1E065E242B8E4A00F2FD42 /* libz.tbd */; };
@@ -16,6 +22,15 @@
 		CB1FD42D20455E2D00931B5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB1FD42C20455E2D00931B5F /* Assets.xcassets */; };
 		CB1FD43020455E2D00931B5F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB1FD42E20455E2D00931B5F /* LaunchScreen.storyboard */; };
 		CB1FD43320455E2D00931B5F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1FD43220455E2D00931B5F /* main.m */; };
+		CB3166FE2A4C6B5F0003221B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3166FD2A4C6B5F0003221B /* AppDelegate.m */; };
+		CB3167012A4C6B5F0003221B /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3167002A4C6B5F0003221B /* SceneDelegate.m */; };
+		CB3167042A4C6B5F0003221B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3167032A4C6B5F0003221B /* ViewController.m */; };
+		CB3167072A4C6B5F0003221B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB3167052A4C6B5F0003221B /* Main.storyboard */; };
+		CB3167092A4C6B600003221B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB3167082A4C6B600003221B /* Assets.xcassets */; };
+		CB31670C2A4C6B600003221B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB31670A2A4C6B600003221B /* LaunchScreen.storyboard */; };
+		CB31670F2A4C6B600003221B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CB31670E2A4C6B600003221B /* main.m */; };
+		CB3167142A4C6B7D0003221B /* MMKV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB36F25420F8A20C009AF46F /* MMKV.framework */; };
+		CB3167172A4C6E450003221B /* MMKV.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CB36F25420F8A20C009AF46F /* MMKV.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CB36F24C20F8A20C009AF46F /* MMKVDemoTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CB36F24B20F8A20C009AF46F /* MMKVDemoTests.mm */; };
 		CB36F25A20F8D728009AF46F /* MMKVPerformanceTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = CB36F25920F8D728009AF46F /* MMKVPerformanceTest.mm */; };
 		CB467FBC2431EE3000FD7421 /* MMKVAppExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB467FBB2431EE2D00FD7421 /* MMKVAppExtension.framework */; };
@@ -24,7 +39,7 @@
 		CB6D44CC23B3A44400F369AA /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB6D44CB23B3A44400F369AA /* NotificationCenter.framework */; };
 		CB6D44D023B3A44400F369AA /* TodayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CB6D44CF23B3A44400F369AA /* TodayViewController.m */; };
 		CB6D44D323B3A44400F369AA /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB6D44D123B3A44400F369AA /* MainInterface.storyboard */; };
-		CB6D44D723B3A44400F369AA /* MMKVTodayExtensionDemo.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CB6D44CA23B3A44400F369AA /* MMKVTodayExtensionDemo.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CB6D44D723B3A44400F369AA /* MMKVTodayExtensionDemo.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CB6D44CA23B3A44400F369AA /* MMKVTodayExtensionDemo.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CB9C2731215E5DF000448B6C /* libMMKV.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1FD4B52046994D00931B5F /* libMMKV.a */; };
 		CB9F963920FCA7C500A1C14C /* DemoSwiftUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9F963820FCA7C500A1C14C /* DemoSwiftUsage.swift */; };
 		CBB306612435E8F200CB593E /* ViewController+TestCaseBad.mm in Sources */ = {isa = PBXBuildFile; fileRef = CBB306602435E8F200CB593E /* ViewController+TestCaseBad.mm */; };
@@ -36,7 +51,7 @@
 		CBD5359023B46E8500D3A404 /* libMMKV.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1FD4B52046994D00931B5F /* libMMKV.a */; };
 		CBF19016243D6F59001C82ED /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CBF19014243D6F59001C82ED /* Interface.storyboard */; };
 		CBF19018243D6F5A001C82ED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CBF19017243D6F5A001C82ED /* Assets.xcassets */; };
-		CBF1901F243D6F5A001C82ED /* WatchApp Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CBF1901E243D6F5A001C82ED /* WatchApp Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CBF1901F243D6F5A001C82ED /* WatchApp Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CBF1901E243D6F5A001C82ED /* WatchApp Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CBF19025243D6F5A001C82ED /* InterfaceController.m in Sources */ = {isa = PBXBuildFile; fileRef = CBF19024243D6F5A001C82ED /* InterfaceController.m */; };
 		CBF19028243D6F5A001C82ED /* ExtensionDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = CBF19027243D6F5A001C82ED /* ExtensionDelegate.mm */; };
 		CBF1902B243D6F5A001C82ED /* NotificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = CBF1902A243D6F5A001C82ED /* NotificationController.m */; };
@@ -133,6 +148,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		702CE6862B7E85070015E8A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				702CE6852B7E85070015E8A4 /* MMKV.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CB3167162A4C6E380003221B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CB3167172A4C6E450003221B /* MMKV.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CB6180E926E90493003FF912 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,15 +179,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CB6D44DB23B3A44400F369AA /* Embed App Extensions */ = {
+		CB6D44DB23B3A44400F369AA /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				CB6D44D723B3A44400F369AA /* MMKVTodayExtensionDemo.appex in Embed App Extensions */,
+				CB6D44D723B3A44400F369AA /* MMKVTodayExtensionDemo.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CBF19033243D6F5A001C82ED /* Embed Watch Content */ = {
@@ -165,15 +201,15 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CBF19036243D6F5A001C82ED /* Embed App Extensions */ = {
+		CBF19036243D6F5A001C82ED /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				CBF1901F243D6F5A001C82ED /* WatchApp Extension.appex in Embed App Extensions */,
+				CBF1901F243D6F5A001C82ED /* WatchApp Extension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CBF190AE243D78D4001C82ED /* Frameworks */ = {
@@ -190,6 +226,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		702CE6802B7E84360015E8A4 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/XROS.platform/Developer/SDKs/XROS1.0.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
+		70A630902B7E7EC9003AB1DF /* MMKVVisionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MMKVVisionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		70A630962B7E7EC9003AB1DF /* MMKVVisionDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMKVVisionDemoApp.swift; sourceTree = "<group>"; };
+		70A630982B7E7EC9003AB1DF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		70A6309A2B7E7ECA003AB1DF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		70A6309D2B7E7ECA003AB1DF /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		70A6309F2B7E7ECA003AB1DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CB1E065E242B8E4A00F2FD42 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
 		CB1FD42020455E2D00931B5F /* MMKVDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MMKVDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB1FD42320455E2D00931B5F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -203,6 +246,19 @@
 		CB1FD43220455E2D00931B5F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		CB1FD4B02046994C00931B5F /* MMKV.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MMKV.xcodeproj; path = ../MMKV/MMKV.xcodeproj; sourceTree = "<group>"; };
 		CB1FD4D12046AF2300931B5F /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		CB3166FA2A4C6B5F0003221B /* kvdemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = kvdemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB3166FC2A4C6B5F0003221B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		CB3166FD2A4C6B5F0003221B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		CB3166FF2A4C6B5F0003221B /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		CB3167002A4C6B5F0003221B /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		CB3167022A4C6B5F0003221B /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		CB3167032A4C6B5F0003221B /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		CB3167062A4C6B5F0003221B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		CB3167082A4C6B600003221B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CB31670B2A4C6B600003221B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CB31670D2A4C6B600003221B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CB31670E2A4C6B600003221B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CB3167152A4C6BA90003221B /* kvdemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = kvdemo.entitlements; sourceTree = "<group>"; };
 		CB36F24920F8A20C009AF46F /* MMKVDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MMKVDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB36F24B20F8A20C009AF46F /* MMKVDemoTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MMKVDemoTests.mm; sourceTree = "<group>"; };
 		CB36F24D20F8A20C009AF46F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -248,12 +304,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		70A6308D2B7E7EC9003AB1DF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				702CE6842B7E85070015E8A4 /* MMKV.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CB1FD41D20455E2D00931B5F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				CB1E0659242B8E3F00F2FD42 /* libz.tbd in Frameworks */,
 				CBD5359023B46E8500D3A404 /* libMMKV.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CB3166F72A4C6B5F0003221B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB3167142A4C6B7D0003221B /* MMKV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +366,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		70A630912B7E7EC9003AB1DF /* MMKVVisionDemo */ = {
+			isa = PBXGroup;
+			children = (
+				70A630962B7E7EC9003AB1DF /* MMKVVisionDemoApp.swift */,
+				70A630982B7E7EC9003AB1DF /* ContentView.swift */,
+				70A6309A2B7E7ECA003AB1DF /* Assets.xcassets */,
+				70A6309F2B7E7ECA003AB1DF /* Info.plist */,
+				70A6309C2B7E7ECA003AB1DF /* Preview Content */,
+			);
+			path = MMKVVisionDemo;
+			sourceTree = "<group>";
+		};
+		70A6309C2B7E7ECA003AB1DF /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				70A6309D2B7E7ECA003AB1DF /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		CB1FD41720455E2D00931B5F = {
 			isa = PBXGroup;
 			children = (
@@ -304,6 +396,8 @@
 				CB6D44CD23B3A44400F369AA /* MMKVTodayExtensionDemo */,
 				CBF19013243D6F59001C82ED /* WatchApp */,
 				CBF19022243D6F5A001C82ED /* WatchApp Extension */,
+				CB3166FB2A4C6B5F0003221B /* kvdemo */,
+				70A630912B7E7EC9003AB1DF /* MMKVVisionDemo */,
 				CB1FD42120455E2D00931B5F /* Products */,
 				CB1FD45720455F3500931B5F /* Frameworks */,
 			);
@@ -319,6 +413,8 @@
 				CB6D44CA23B3A44400F369AA /* MMKVTodayExtensionDemo.appex */,
 				CBF19012243D6F59001C82ED /* WatchApp.app */,
 				CBF1901E243D6F5A001C82ED /* WatchApp Extension.appex */,
+				CB3166FA2A4C6B5F0003221B /* kvdemo.app */,
+				70A630902B7E7EC9003AB1DF /* MMKVVisionDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -348,6 +444,7 @@
 			isa = PBXGroup;
 			children = (
 				CB1E065E242B8E4A00F2FD42 /* libz.tbd */,
+				702CE6802B7E84360015E8A4 /* libz.tbd */,
 				CBD5359823B4718200D3A404 /* libc++.tbd */,
 				CB9C2732215E5ECC00448B6C /* libz.tbd */,
 				CB1FD4D12046AF2300931B5F /* libz.tbd */,
@@ -365,6 +462,25 @@
 				CBF1907C243D7116001C82ED /* MMKVWatchExtension.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CB3166FB2A4C6B5F0003221B /* kvdemo */ = {
+			isa = PBXGroup;
+			children = (
+				CB3167152A4C6BA90003221B /* kvdemo.entitlements */,
+				CB3166FC2A4C6B5F0003221B /* AppDelegate.h */,
+				CB3166FD2A4C6B5F0003221B /* AppDelegate.m */,
+				CB3166FF2A4C6B5F0003221B /* SceneDelegate.h */,
+				CB3167002A4C6B5F0003221B /* SceneDelegate.m */,
+				CB3167022A4C6B5F0003221B /* ViewController.h */,
+				CB3167032A4C6B5F0003221B /* ViewController.m */,
+				CB3167052A4C6B5F0003221B /* Main.storyboard */,
+				CB3167082A4C6B600003221B /* Assets.xcassets */,
+				CB31670A2A4C6B600003221B /* LaunchScreen.storyboard */,
+				CB31670D2A4C6B600003221B /* Info.plist */,
+				CB31670E2A4C6B600003221B /* main.m */,
+			);
+			path = kvdemo;
 			sourceTree = "<group>";
 		};
 		CB36F24A20F8A20C009AF46F /* MMKVDemoTests */ = {
@@ -434,6 +550,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		70A6308F2B7E7EC9003AB1DF /* MMKVVisionDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 70A630A32B7E7ECA003AB1DF /* Build configuration list for PBXNativeTarget "MMKVVisionDemo" */;
+			buildPhases = (
+				70A6308C2B7E7EC9003AB1DF /* Sources */,
+				70A6308D2B7E7EC9003AB1DF /* Frameworks */,
+				70A6308E2B7E7EC9003AB1DF /* Resources */,
+				702CE6862B7E85070015E8A4 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MMKVVisionDemo;
+			packageProductDependencies = (
+			);
+			productName = MMKVVisionDemo;
+			productReference = 70A630902B7E7EC9003AB1DF /* MMKVVisionDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
 		CB1FD41F20455E2D00931B5F /* MMKVDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CB1FD43620455E2D00931B5F /* Build configuration list for PBXNativeTarget "MMKVDemo" */;
@@ -441,7 +577,7 @@
 				CB1FD41C20455E2D00931B5F /* Sources */,
 				CB1FD41D20455E2D00931B5F /* Frameworks */,
 				CB1FD41E20455E2D00931B5F /* Resources */,
-				CB6D44DB23B3A44400F369AA /* Embed App Extensions */,
+				CB6D44DB23B3A44400F369AA /* Embed Foundation Extensions */,
 				CBF19033243D6F5A001C82ED /* Embed Watch Content */,
 				CB6180E926E90493003FF912 /* CopyFiles */,
 			);
@@ -455,6 +591,24 @@
 			name = MMKVDemo;
 			productName = MMKVDemo;
 			productReference = CB1FD42020455E2D00931B5F /* MMKVDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CB3166F92A4C6B5F0003221B /* kvdemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CB3167132A4C6B600003221B /* Build configuration list for PBXNativeTarget "kvdemo" */;
+			buildPhases = (
+				CB3166F62A4C6B5F0003221B /* Sources */,
+				CB3166F72A4C6B5F0003221B /* Frameworks */,
+				CB3166F82A4C6B5F0003221B /* Resources */,
+				CB3167162A4C6E380003221B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = kvdemo;
+			productName = kvdemo;
+			productReference = CB3166FA2A4C6B5F0003221B /* kvdemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		CB36F24820F8A20C009AF46F /* MMKVDemoTests */ = {
@@ -516,7 +670,7 @@
 			buildConfigurationList = CBF1903B243D6F5A001C82ED /* Build configuration list for PBXNativeTarget "WatchApp" */;
 			buildPhases = (
 				CBF19010243D6F59001C82ED /* Resources */,
-				CBF19036243D6F5A001C82ED /* Embed App Extensions */,
+				CBF19036243D6F5A001C82ED /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -553,9 +707,15 @@
 		CB1FD41820455E2D00931B5F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = Lingol;
 				TargetAttributes = {
+					70A6308F2B7E7EC9003AB1DF = {
+						CreatedOnToolsVersion = 15.2;
+						ProvisioningStyle = Automatic;
+					};
 					CB1FD41F20455E2D00931B5F = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1020;
@@ -565,6 +725,10 @@
 								enabled = 1;
 							};
 						};
+					};
+					CB3166F92A4C6B5F0003221B = {
+						CreatedOnToolsVersion = 14.2;
+						ProvisioningStyle = Manual;
 					};
 					CB36F24820F8A20C009AF46F = {
 						CreatedOnToolsVersion = 9.4.1;
@@ -614,6 +778,8 @@
 				CB6D44C923B3A44400F369AA /* MMKVTodayExtensionDemo */,
 				CBF19011243D6F59001C82ED /* WatchApp */,
 				CBF1901D243D6F5A001C82ED /* WatchApp Extension */,
+				CB3166F92A4C6B5F0003221B /* kvdemo */,
+				70A6308F2B7E7EC9003AB1DF /* MMKVVisionDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -650,6 +816,15 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		70A6308E2B7E7EC9003AB1DF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70A6309E2B7E7ECA003AB1DF /* Preview Assets.xcassets in Resources */,
+				70A6309B2B7E7ECA003AB1DF /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CB1FD41E20455E2D00931B5F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -657,6 +832,16 @@
 				CB1FD43020455E2D00931B5F /* LaunchScreen.storyboard in Resources */,
 				CB1FD42D20455E2D00931B5F /* Assets.xcassets in Resources */,
 				CB1FD42B20455E2D00931B5F /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CB3166F82A4C6B5F0003221B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB31670C2A4C6B600003221B /* LaunchScreen.storyboard in Resources */,
+				CB3167092A4C6B600003221B /* Assets.xcassets in Resources */,
+				CB3167072A4C6B5F0003221B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,6 +889,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		70A6308C2B7E7EC9003AB1DF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70A630992B7E7EC9003AB1DF /* ContentView.swift in Sources */,
+				70A630972B7E7EC9003AB1DF /* MMKVVisionDemoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CB1FD41C20455E2D00931B5F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -713,6 +907,17 @@
 				CB1FD43320455E2D00931B5F /* main.m in Sources */,
 				CB9F963920FCA7C500A1C14C /* DemoSwiftUsage.swift in Sources */,
 				CB1FD42520455E2D00931B5F /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CB3166F62A4C6B5F0003221B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB3167042A4C6B5F0003221B /* ViewController.m in Sources */,
+				CB3166FE2A4C6B5F0003221B /* AppDelegate.m in Sources */,
+				CB31670F2A4C6B600003221B /* main.m in Sources */,
+				CB3167012A4C6B5F0003221B /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -815,6 +1020,22 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		CB3167052A4C6B5F0003221B /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CB3167062A4C6B5F0003221B /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		CB31670A2A4C6B600003221B /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CB31670B2A4C6B600003221B /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		CB6D44D123B3A44400F369AA /* MainInterface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -842,10 +1063,82 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		70A630A02B7E7ECA003AB1DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MMKVVisionDemo/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.MMKVVisionDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Debug;
+		};
+		70A630A12B7E7ECA003AB1DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MMKVVisionDemo/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.MMKVVisionDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 1.0;
+			};
+			name = Release;
+		};
 		CB1FD43420455E2D00931B5F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -904,6 +1197,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -962,8 +1256,10 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				INFOPLIST_FILE = MMKVDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = MMKVDemo;
@@ -983,14 +1279,85 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				INFOPLIST_FILE = MMKVDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = MMKVDemo;
 				SWIFT_OBJC_BRIDGING_HEADER = "MMKVDemo/MMKVDemo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CB3167102A4C6B600003221B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = kvdemo/kvdemo.entitlements;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = SG5PVJM4JW;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = kvdemo/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.kvdemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = mmkvdemo2;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CB3167112A4C6B600003221B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = kvdemo/kvdemo.entitlements;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = SG5PVJM4JW;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = kvdemo/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.kvdemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = mmkvdemo2;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1006,8 +1373,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 52LMU3A345;
 				INFOPLIST_FILE = MMKVDemoTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1026,8 +1396,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 52LMU3A345;
 				INFOPLIST_FILE = MMKVDemoTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1044,9 +1417,12 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				INFOPLIST_FILE = MMKVTodayExtensionDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1067,9 +1443,12 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				INFOPLIST_FILE = MMKVTodayExtensionDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemo.MMKVTodayExtensionDemo;
@@ -1089,11 +1468,15 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MMKVMacDemo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvmacdemo;
@@ -1112,11 +1495,15 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MMKVMacDemo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvmacdemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1174,7 +1561,11 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				INFOPLIST_FILE = "WatchApp Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemo.watchkitapp.watchkitextension;
@@ -1195,7 +1586,11 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = SG5PVJM4JW;
 				INFOPLIST_FILE = "WatchApp Extension/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.mmkvdemo.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
@@ -1210,6 +1605,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		70A630A32B7E7ECA003AB1DF /* Build configuration list for PBXNativeTarget "MMKVVisionDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70A630A02B7E7ECA003AB1DF /* Debug */,
+				70A630A12B7E7ECA003AB1DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		CB1FD41B20455E2D00931B5F /* Build configuration list for PBXProject "MMKVDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1224,6 +1628,15 @@
 			buildConfigurations = (
 				CB1FD43720455E2D00931B5F /* Debug */,
 				CB1FD43820455E2D00931B5F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CB3167132A4C6B600003221B /* Build configuration list for PBXNativeTarget "kvdemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB3167102A4C6B600003221B /* Debug */,
+				CB3167112A4C6B600003221B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

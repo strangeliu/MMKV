@@ -19,6 +19,7 @@
  */
 
 #include "MMKV.h"
+// #include <bits/alltypes.h>
 
 #ifdef MMKV_ANDROID
 
@@ -38,13 +39,14 @@ using namespace mmkv;
 extern unordered_map<string, MMKV *> *g_instanceDic;
 extern ThreadLock *g_instanceLock;
 
-MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, string *cryptKey, string *rootPath)
+MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, string *cryptKey, string *rootPath, size_t expectedCapacity)
     : m_mmapID((mode & MMKV_BACKUP) ? mmapID : mmapedKVKey(mmapID, rootPath)) // historically Android mistakenly use mmapKey as mmapID
     , m_path(mappedKVPathWithID(m_mmapID, mode, rootPath))
     , m_crcPath(crcPathWithID(m_mmapID, mode, rootPath))
     , m_dic(nullptr)
     , m_dicCrypt(nullptr)
-    , m_file(new MemoryFile(m_path, size, (mode & MMKV_ASHMEM) ? MMFILE_TYPE_ASHMEM : MMFILE_TYPE_FILE))
+    , m_expectedCapacity(std::max<size_t>(DEFAULT_MMAP_SIZE, roundUp<size_t>(expectedCapacity, DEFAULT_MMAP_SIZE)))
+    , m_file(new MemoryFile(m_path, size, (mode & MMKV_ASHMEM) ? MMFILE_TYPE_ASHMEM : MMFILE_TYPE_FILE, m_expectedCapacity))
     , m_metaFile(new MemoryFile(m_crcPath, DEFAULT_MMAP_SIZE, m_file->m_fileType))
     , m_metaInfo(new MMKVMetaInfo())
     , m_crypter(nullptr)
@@ -80,10 +82,10 @@ MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, string *cryptKey, stri
     m_exclusiveProcessLock->m_enable = m_isInterProcess;
 
     // sensitive zone
-    {
+    /*{
         SCOPED_LOCK(m_sharedProcessLock);
         loadFromFile();
-    }
+    }*/
 }
 
 MMKV::MMKV(const string &mmapID, int ashmemFD, int ashmemMetaFD, string *cryptKey)
@@ -129,13 +131,13 @@ MMKV::MMKV(const string &mmapID, int ashmemFD, int ashmemMetaFD, string *cryptKe
     m_exclusiveProcessLock->m_enable = m_isInterProcess;
 
     // sensitive zone
-    {
+    /*{
         SCOPED_LOCK(m_sharedProcessLock);
         loadFromFile();
-    }
+    }*/
 }
 
-MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, string *cryptKey, string *rootPath) {
+MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, string *cryptKey, string *rootPath, size_t expectedCapacity) {
     if (mmapID.empty()) {
         return nullptr;
     }
@@ -153,9 +155,9 @@ MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, string *cr
                 return nullptr;
             }
         }
-        MMKVInfo("prepare to load %s (id %s) from rootPath %s", mmapID.c_str(), mmapKey.c_str(), rootPath->c_str());
+        MMKVInfo("prepare to load %s (id %s) from rootPath %zu", mmapID.c_str(), mmapKey.c_str(), rootPath->c_str());
     }
-    auto kv = new MMKV(mmapID, size, mode, cryptKey, rootPath);
+    auto kv = new MMKV(mmapID, size, mode, cryptKey, rootPath, expectedCapacity);
     (*g_instanceDic)[mmapKey] = kv;
     return kv;
 }
