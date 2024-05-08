@@ -16,11 +16,22 @@ jobs:
           xcode-version: 15.0
       - name: Build Binaries
         run: iOS/archive_xcframework.sh
+      - name: Compute Checksum
+        id: checksum
+        run: |
+          echo "checksum=$(swift package compute-checksum ./archives/MMKV.xcframework.zip)" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
+          body: |
+            ```swift
+            .binaryTarget(
+                name: "MMKV",
+                url: "https://github.com/Kyle-Ye/MMKV/releases/download/v1.3.5-binary/MMKV.xcframework.zip",
+                checksum: "${{ steps.checksum.outputs.checksum }}"
+            ),
+            ```
           allowUpdates: true
           artifacts: "archives/MMKV.xcframework.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
-
