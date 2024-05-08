@@ -3,7 +3,7 @@
 rm -rf archives
 xcodebuild archive \
 -workspace MMKV.xcworkspace \
--scheme MMKV \
+-scheme 'MMKV Static' \
 -configuration Release \
 -destination "generic/platform=iOS" \
 -archivePath "archives/MMKV-iOS" \
@@ -12,7 +12,7 @@ BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 xcodebuild archive \
 -workspace MMKV.xcworkspace \
--scheme MMKV \
+-scheme 'MMKV Static' \
 -configuration Release \
 -destination "generic/platform=iOS Simulator" \
 -archivePath "archives/MMKV-iOS-Simulator" \
@@ -21,7 +21,7 @@ BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 xcodebuild archive \
 -workspace MMKV.xcworkspace \
--scheme MMKV \
+-scheme 'MMKV Static' \
 -configuration Release \
 -destination "generic/platform=macOS" \
 -archivePath "archives/MMKV-macOS" \
@@ -30,9 +30,9 @@ BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 xcodebuild \
 -create-xcframework \
--archive archives/MMKV-iOS.xcarchive -framework MMKV.framework \
--archive archives/MMKV-iOS-Simulator.xcarchive -framework MMKV.framework \
--archive archives/MMKV-macOS.xcarchive -framework MMKV.framework \
--output archives/MMKV.xcframework
+-archive archives/MMKV-iOS.xcarchive -library libMMKV.a \
+-archive archives/MMKV-macOS.xcarchive -library libMMKV.a \
+-archive archives/MMKV-iOS-Simulator.xcarchive -library libMMKV.a \
+-output archives/MMKV-Static.xcframework
 
-zip -r -X "archives/MMKV.xcframework.zip" "archives/MMKV.xcframework"
+zip -r -X "archives/MMKV-Static.xcframework.zip" "archives/MMKV-Static.xcframework"
