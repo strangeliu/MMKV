@@ -3,7 +3,7 @@ name: Publish Release
 on:
   push:
     tags:
-      - 'v*-binary'  # This will trigger the workflow when a tag matching 'v*' pattern is pushed
+      - 'v*-binary-static'  # This will trigger the workflow when a tag matching 'v*' pattern is pushed
 
 jobs:
   publish_release:
@@ -15,11 +15,11 @@ jobs:
         with:
           xcode-version: 15.0
       - name: Build Binaries
-        run: iOS/archive_xcframework.sh
+        run: iOS/archive_static_xcframework.sh
       - name: Compute Checksum
         id: checksum
         run: |
-          echo "checksum=$(swift package compute-checksum ./archives/MMKV.xcframework.zip)" >> $GITHUB_OUTPUT
+          echo "checksum=$(swift package compute-checksum ./archives/MMKV-Static.xcframework.zip)" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
@@ -28,10 +28,10 @@ jobs:
             ```swift
             .binaryTarget(
                 name: "MMKV",
-                url: "https://github.com/Kyle-Ye/MMKV/releases/download/v1.3.5-binary/MMKV.xcframework.zip",
+                url: "https://github.com/strangeliu/MMKV/releases/download/${{ github.ref_name }}/MMKV-Static.xcframework.zip",
                 checksum: "${{ steps.checksum.outputs.checksum }}"
             ),
             ```
           allowUpdates: true
-          artifacts: "archives/MMKV.xcframework.zip"
+          artifacts: "archives/MMKV-Static.xcframework.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
